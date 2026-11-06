@@ -3,7 +3,7 @@
  * hosts it in a WebView.
  *
  * ```ts
- * import { createBridge } from "@kt3k/gawa";
+ * import { createBridge } from "gawa";
  *
  * type Methods = {
  *   "kv.get": (p: { key: string }) => string | null;

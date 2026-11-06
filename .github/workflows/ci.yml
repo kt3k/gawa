@@ -21,8 +21,8 @@ jobs:
         working-directory: web
       - run: deno test
         working-directory: web
-      - run: deno publish --dry-run
-        working-directory: web
+      - name: web/dist is up to date with web/mod.ts
+        run: web/build.sh && git diff --exit-code -- web/dist
       - run: deno check src/main.ts && ./build.sh
         working-directory: examples/web
 

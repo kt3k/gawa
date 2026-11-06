@@ -19,21 +19,46 @@ attach gawa to it.
 
 ## Install
 
-| package | source                | install                                                                                    |
-| ------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| web     | [`web/`](web)         | `deno add jsr:@kt3k/gawa` / `npx jsr add @kt3k/gawa`                                       |
-| iOS     | [`ios/`](ios)         | Swift Package Manager: `https://github.com/kt3k/gawa` (product `Gawa`, iOS 15+, macOS 12+) |
-| Android | [`android/`](android) | JitPack: `implementation("com.github.kt3k:gawa:<tag>")` (minSdk 24)                        |
+Everything is installed straight from a git tag — no registry needed.
 
-Android via JitPack needs the repository in `settings.gradle.kts`:
+**Web** (npm / pnpm / yarn): the compiled `web/dist` is committed.
+
+```sh
+npm install github:kt3k/gawa#v0.1.0
+```
+
+```ts
+import { createBridge } from "gawa";
+```
+
+**Web** (Deno): import the source by URL.
+
+```ts
+import { createBridge } from "https://raw.githubusercontent.com/kt3k/gawa/v0.1.0/web/mod.ts";
+```
+
+**iOS** (Swift Package Manager, iOS 15+ / macOS 12+): add
+`https://github.com/kt3k/gawa` and use the `Gawa` product.
+
+```swift
+.package(url: "https://github.com/kt3k/gawa", from: "0.1.0")
+```
+
+**Android** (minSdk 24) via [JitPack](https://jitpack.io/#kt3k/gawa), which
+builds the tag on first request:
 
 ```kotlin
+// settings.gradle.kts
 dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
         maven("https://jitpack.io")
     }
+}
+// build.gradle.kts
+dependencies {
+    implementation("com.github.kt3k:gawa:v0.1.0")
 }
 ```
 
@@ -130,10 +155,11 @@ own client.
 
 ## Releasing
 
-1. Bump `version` in `web/deno.json` (and the default in
-   `android/gawa/build.gradle.kts`).
-2. Tag `vX.Y.Z` and push the tag. The `publish` workflow publishes the web
-   package to JSR; Swift Package Manager and JitPack use the tag directly.
+1. Bump the version in `package.json` and the default in
+   `android/gawa/build.gradle.kts`.
+2. Run `web/build.sh` and commit `web/dist` (CI fails if it is stale).
+3. Tag `vX.Y.Z` and push the tag. npm, Deno, Swift Package Manager and JitPack
+   all consume the tag directly.
 
 ## Protocol
 

@@ -1,0 +1,16 @@
+{
+  "name": "gawa",
+  "version": "0.1.0",
+  "description": "A thin, typed bridge between a web page and the native iOS / Android app hosting it in a WebView",
+  "license": "MIT",
+  "repository": "github:kt3k/gawa",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./web/dist/mod.d.ts",
+      "default": "./web/dist/mod.js"
+    }
+  },
+  "files": ["web/dist", "web/mod.ts"],
+  "sideEffects": false
+}
