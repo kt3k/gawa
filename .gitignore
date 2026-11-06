@@ -1,0 +1,11 @@
+.DS_Store
+# Swift
+ios/.build/
+ios/.swiftpm/
+# Android / Gradle
+android/.gradle/
+android/build/
+android/gawa/build/
+android/local.properties
+.idea/
+*.iml
