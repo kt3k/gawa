@@ -8,7 +8,8 @@ let package = Package(
         .library(name: "Gawa", targets: ["Gawa"]),
     ],
     targets: [
-        .target(name: "Gawa"),
-        .testTarget(name: "GawaTests", dependencies: ["Gawa"]),
+        .target(name: "Gawa", path: "ios/Sources/Gawa"),
+        .testTarget(
+            name: "GawaTests", dependencies: ["Gawa"], path: "ios/Tests/GawaTests"),
     ]
 )

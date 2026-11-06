@@ -9,3 +9,5 @@ android/gawa/build/
 android/local.properties
 .idea/
 *.iml
+examples/web/www/main.js
+examples/ios/GawaExample.xcodeproj/

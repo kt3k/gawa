@@ -16,3 +16,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "gawa-android"
 include(":gawa")
+include(":example")
+project(":example").projectDir = file("../examples/android")

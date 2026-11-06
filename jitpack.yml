@@ -1,0 +1,6 @@
+# JitPack: https://jitpack.io/#kt3k/gawa
+# Dependency: implementation("com.github.kt3k:gawa:<tag>")
+jdk:
+  - openjdk17
+install:
+  - cd android && ./gradlew :gawa:publishReleasePublicationToMavenLocal -PpublishGroup=$GROUP -PpublishVersion=$VERSION

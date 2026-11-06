@@ -17,11 +17,31 @@ opinion about your screens.
 It works in an app you already have — add a `WKWebView` / `WebView` anywhere and
 attach gawa to it.
 
-| package | path       | install                                       |
-| ------- | ---------- | --------------------------------------------- |
-| web     | `web/`     | `deno add jsr:@kt3k/gawa` (not published yet) |
-| iOS     | `ios/`     | Swift Package (iOS 15+, macOS 12+)            |
-| Android | `android/` | Android library (minSdk 24)                   |
+## Install
+
+| package | source                | install                                                                                    |
+| ------- | --------------------- | ------------------------------------------------------------------------------------------ |
+| web     | [`web/`](web)         | `deno add jsr:@kt3k/gawa` / `npx jsr add @kt3k/gawa`                                       |
+| iOS     | [`ios/`](ios)         | Swift Package Manager: `https://github.com/kt3k/gawa` (product `Gawa`, iOS 15+, macOS 12+) |
+| Android | [`android/`](android) | JitPack: `implementation("com.github.kt3k:gawa:<tag>")` (minSdk 24)                        |
+
+Android via JitPack needs the repository in `settings.gradle.kts`:
+
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://jitpack.io")
+    }
+}
+```
+
+## Examples
+
+[`examples/`](examples) has a minimal iOS app and Android app showing the same
+bundled page. The page also tests the bridge end to end; CI runs it in a real
+`WKWebView` (macOS) and a real Android `WebView` (emulator).
 
 ## Web
 
@@ -107,6 +127,13 @@ Use `Unit` for no parameters / no result. Types crossing the bridge must be
 plugin). `GawaWebViewClient` also opens links to other origins in the browser;
 subclass it or call `GawaAssets.loader(...).shouldInterceptRequest` from your
 own client.
+
+## Releasing
+
+1. Bump `version` in `web/deno.json` (and the default in
+   `android/gawa/build.gradle.kts`).
+2. Tag `vX.Y.Z` and push the tag. The `publish` workflow publishes the web
+   package to JSR; Swift Package Manager and JitPack use the tag directly.
 
 ## Protocol
 

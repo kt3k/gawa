@@ -1,0 +1,32 @@
+name: publish
+
+# Publishes the web package to JSR when a version tag (v1.2.3) is pushed.
+# The iOS package (Swift Package Manager) and the Android library (JitPack)
+# are consumed straight from the tag.
+#
+# One-time setup: create the @kt3k/gawa package on jsr.io and link it to
+# this repository (package settings → GitHub repository), so the OIDC token
+# below is accepted.
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  jsr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check that web/deno.json matches the tag
+        working-directory: web
+        run: |
+          v=$(deno eval 'console.log(JSON.parse(Deno.readTextFileSync("deno.json")).version)')
+          test "v$v" = "$GITHUB_REF_NAME" || { echo "deno.json has $v, tag is $GITHUB_REF_NAME"; exit 1; }
+      - run: deno publish
+        working-directory: web
