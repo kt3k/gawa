@@ -85,9 +85,11 @@ public class GawaRouter(
         } catch (e: Exception) {
             return null
         }
-        if ((env["gawa"] as? JsonPrimitive)?.intOrNull != PROTOCOL) return null
-        if ((env["hello"] as? JsonPrimitive)?.content == "true") return Incoming.Hello
-        if ((env["id"] as? JsonPrimitive)?.intOrNull == null) return null
+        if (env["gawa"].number()?.intOrNull != PROTOCOL) return null
+        if (env["hello"].let { it is JsonPrimitive && !it.isString && it.content == "true" }) {
+            return Incoming.Hello
+        }
+        if (env["id"].number()?.intOrNull == null) return null
         if ((env["method"] as? JsonPrimitive)?.isString != true) return null
         return Incoming.Request(env)
     }
@@ -127,6 +129,10 @@ public class GawaRouter(
             put("event", event)
             put("data", data)
         }.toString()
+
+    /** The element as a JSON number (not a numeric string), or null. */
+    private fun JsonElement?.number(): JsonPrimitive? =
+        (this as? JsonPrimitive)?.takeIf { !it.isString && it !is JsonNull }
 
     private fun errorEnvelope(id: Int, code: String, message: String) = buildJsonObject {
         put("gawa", PROTOCOL)

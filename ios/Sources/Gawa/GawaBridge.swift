@@ -27,11 +27,11 @@ public final class GawaBridge: NSObject, WKScriptMessageHandlerWithReply {
     ///     use the bridge, e.g. `app://localhost` for `GawaSchemeHandler`.
     ///   - allowSubframes: also accept messages from iframes.
     public init(
-        allowedOrigins: [URL], allowSubframes: Bool = false, router: GawaRouter = GawaRouter()
+        allowedOrigins: [URL], allowSubframes: Bool = false, router: GawaRouter? = nil
     ) {
         self.allowedOrigins = allowedOrigins
         self.allowSubframes = allowSubframes
-        self.router = router
+        self.router = router ?? GawaRouter()
     }
 
     /// Installs the `gawa` message handler on the web view. Call it before
