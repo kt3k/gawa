@@ -72,6 +72,10 @@ dependencies {
 
 Types that cross the bridge must be `@Serializable`. See [Android](/docs/android/).
 
+## One method list
+
+The example page and the two apps share [`schema/example.json`](https://github.com/kt3k/gawa/blob/main/schema/example.json). `deno run -A schema/generate.ts` writes the TypeScript, Swift, and Kotlin types. CI fails if those files drift from the schema.
+
 ## Wire it up
 
 1. Bundle the web build and serve it from a real origin: [`GawaSchemeHandler`](/docs/ios/) on iOS (`app://localhost/` in the examples), [`GawaAssets`](/docs/android/) on Android (`https://appassets.androidplatform.net/`).

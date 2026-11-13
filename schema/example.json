@@ -1,0 +1,56 @@
+{
+  "methods": [
+    {
+      "name": "echo",
+      "params": {
+        "name": "Echo",
+        "fields": [{ "name": "text", "type": "string" }]
+      },
+      "result": "string"
+    },
+    {
+      "name": "add",
+      "params": {
+        "name": "Add",
+        "fields": [
+          { "name": "a", "type": "int" },
+          { "name": "b", "type": "int" }
+        ]
+      },
+      "result": "int"
+    },
+    {
+      "name": "fail",
+      "params": null,
+      "result": "void"
+    },
+    {
+      "name": "missing",
+      "params": null,
+      "result": "void",
+      "pageOnly": true
+    },
+    {
+      "name": "startTicks",
+      "params": {
+        "name": "Ticks",
+        "fields": [{ "name": "count", "type": "int" }]
+      },
+      "result": "void"
+    },
+    {
+      "name": "report",
+      "params": {
+        "name": "Report",
+        "fields": [
+          { "name": "ok", "type": "bool" },
+          { "name": "log", "type": "string[]" }
+        ]
+      },
+      "result": "void"
+    }
+  ],
+  "events": [
+    { "name": "tick", "data": "int" }
+  ]
+}

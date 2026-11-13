@@ -23,6 +23,13 @@ jobs:
         working-directory: web
       - name: web/dist is up to date with web/mod.ts
         run: web/build.sh && git diff --exit-code -- web/dist
+      - name: generated bridge types match schema/example.json
+        run: >-
+          deno run -A schema/generate.ts &&
+          git diff --exit-code --
+          examples/web/src/methods.ts
+          examples/ios/Sources/ExampleTypes.swift
+          examples/android/src/main/kotlin/io/github/kt3k/gawa/example/ExampleTypes.kt
       - run: deno check src/main.ts && ./build.sh
         working-directory: examples/web
 

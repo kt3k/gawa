@@ -13,12 +13,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
-
-@Serializable data class Echo(val text: String)
-@Serializable data class Add(val a: Int, val b: Int)
-@Serializable data class Ticks(val count: Int)
-@Serializable data class Report(val ok: Boolean, val log: List<String>)
 
 /** Shows the bundled example page (examples/web) and answers its calls. */
 class MainActivity : Activity() {

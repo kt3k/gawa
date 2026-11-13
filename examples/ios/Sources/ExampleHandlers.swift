@@ -3,15 +3,11 @@ import Gawa
 
 /// The methods the example page (examples/web) calls.
 ///
-/// Kept in sync with ios/Tests/GawaTests/EndToEndTests.swift, which runs
-/// the same page in a WKWebView on macOS.
+/// Parameter types come from schema/example.json (ExampleTypes.swift).
+/// ios/Tests/GawaTests/EndToEndTests.swift repeats them so the macOS
+/// WKWebView test does not depend on this app target.
 @MainActor
 enum ExampleHandlers {
-    struct Echo: Decodable { let text: String }
-    struct Add: Decodable { let a: Int; let b: Int }
-    struct Ticks: Decodable { let count: Int }
-    struct Report: Decodable { let ok: Bool; let log: [String] }
-
     static func register(on bridge: GawaBridge, onReport: @escaping (Report) -> Void) {
         let router = bridge.router
         router.register("echo") { (p: Echo) -> String in p.text }

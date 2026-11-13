@@ -4,16 +4,7 @@
  * them back to the app with the `report` method.
  */
 import { createBridge, GawaError } from "../../../web/mod.ts";
-
-type Methods = {
-  echo: (p: { text: string }) => string;
-  add: (p: { a: number; b: number }) => number;
-  fail: () => void;
-  missing: () => void;
-  startTicks: (p: { count: number }) => void;
-  report: (p: { ok: boolean; log: string[] }) => void;
-};
-type Events = { tick: number };
+import type { Events, Methods } from "./methods.ts";
 
 const bridge = createBridge<Methods, Events>({ timeout: 10_000 });
 const log: string[] = [];

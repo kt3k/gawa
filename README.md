@@ -71,6 +71,10 @@ the same bundled page ([`examples/web`](examples/web)). The page also tests the
 bridge end to end; CI runs it in a real `WKWebView` (macOS) and a real Android
 `WebView` (emulator).
 
+The page, the iOS app, and the Android app share one method list,
+[`schema/example.json`](schema/example.json). Regenerate the types with
+`deno run -A schema/generate.ts`. CI fails if the generated files drift.
+
 Build the page first (requires [Deno](https://deno.com)):
 
 ```sh
