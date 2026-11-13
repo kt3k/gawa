@@ -26,9 +26,12 @@ function tabset(
   return `<div class="panel" data-tabs>
   <div class="panel-bar">
     <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-    <div class="tablist" role="tablist" aria-label="${
+    <div class="tab-tools">
+      <div class="tablist" role="tablist" aria-label="${
     escapeHtml(label)
   }">${buttons}</div>
+      <button type="button" class="copy" data-copy>Copy</button>
+    </div>
   </div>
   ${panels}
 </div>`;
@@ -37,6 +40,9 @@ function tabset(
 /** Home page body. Install snippets use `version` from package.json. */
 export function landing(version: string, base: string): string {
   const started = siteUrl(base, "docs/getting-started/");
+  const originDoc = siteUrl(base, "docs/ios/#serving-the-page");
+  const callDoc = siteUrl(base, "docs/web/#calls");
+  const securityDoc = siteUrl(base, "docs/protocol/#transports");
   const tag = `v${version}`;
   const install = tabset("install", "Install", [
     {
@@ -61,8 +67,12 @@ export function landing(version: string, base: string): string {
       label: "iOS",
       html: blocks([{
         lang: "swift",
-        code:
-          `.package(url: "https://github.com/kt3k/gawa", from: "${version}")\n`,
+        code: `.package(url: "https://github.com/kt3k/gawa", from: "${version}")
+
+// In the app target, depend on the Gawa product.
+// The package identity is the repository name.
+.product(name: "Gawa", package: "gawa")
+`,
       }]),
     },
     {
@@ -79,6 +89,9 @@ dependencyResolutionManagement {
     }
 }
 // build.gradle.kts
+plugins {
+    id("org.jetbrains.kotlin.plugin.serialization")
+}
 dependencies {
     implementation("com.github.kt3k:gawa:${tag}")
 }
@@ -93,7 +106,7 @@ dependencies {
       label: "Web",
       html: blocks([{
         lang: "ts",
-        code: `import { createBridge, GawaError } from "gawa";
+        code: `import { createBridge } from "gawa";
 
 // Describe what your app implements.
 type Methods = {
@@ -107,7 +120,9 @@ const bridge = createBridge<Methods, Events>();
 
 if (bridge.available) {
   const lang = await bridge.call("kv.get", { key: "lang" }); // string | null
-  bridge.on("back", () => closeDialog());
+  bridge.on("back", () => {
+    // Close this page's own UI.
+  });
 } else {
   // In a normal browser: fall back to web APIs.
 }
@@ -156,6 +171,7 @@ val webView = WebView(context)
 webView.webViewClient = GawaWebViewClient(GawaAssets.loader(context))
 
 val bridge = GawaBridge(webView) // before loading the page
+// prefs is the app's own SharedPreferences.
 bridge.router.register<KVGet, String?>("kv.get") { prefs.getString(it.key, null) }
 bridge.router.register<Unit, String>("app.version") { "1.0" }
 
@@ -201,29 +217,29 @@ bridge.emit("back", null as String?)
     <div class="feature-grid">
       <article>
         <p class="num">01</p>
-        <h3>Real-origin asset serving</h3>
+        <h3><a href="${originDoc}">Real-origin asset serving</a></h3>
         <p>Serve bundled files from a real origin instead of <code>file://</code>.</p>
-        <ul>
-          <li>iOS: <code>WKURLSchemeHandler</code> → <code>app://localhost/</code></li>
-          <li>Android: <code>WebViewAssetLoader</code> → <code>https://appassets.androidplatform.net/</code></li>
+        <ul class="spec">
+          <li><span class="spec-k">iOS</span><span class="spec-v"><code>WKURLSchemeHandler</code><span aria-hidden="true">→</span><code>app://localhost/</code></span></li>
+          <li><span class="spec-k">Android</span><span class="spec-v"><code>WebViewAssetLoader</code><span aria-hidden="true">→</span><code>https://appassets.androidplatform.net/</code></span></li>
         </ul>
       </article>
       <article>
         <p class="num">02</p>
-        <h3>Typed RPC and events</h3>
+        <h3><a href="${callDoc}">Typed RPC and events</a></h3>
         <p>Request / reply RPC and events, typed on both ends.</p>
-        <ul>
-          <li>iOS: <code>WKScriptMessageHandlerWithReply</code></li>
-          <li>Android: <code>WebViewCompat.addWebMessageListener</code></li>
+        <ul class="spec">
+          <li><span class="spec-k">iOS</span><span class="spec-v"><code>WKScriptMessageHandlerWithReply</code></span></li>
+          <li><span class="spec-k">Android</span><span class="spec-v"><code>WebViewCompat.addWebMessageListener</code></span></li>
         </ul>
       </article>
       <article>
         <p class="num">03</p>
-        <h3>Origin checks</h3>
+        <h3><a href="${securityDoc}">Origin checks</a></h3>
         <p>Only your bundled page can talk to the app.</p>
-        <ul>
-          <li>iOS: the message's security origin against an allowlist. Main frame only by default.</li>
-          <li>Android: <code>allowedOriginRules</code> on the message listener. Main frame only.</li>
+        <ul class="spec">
+          <li><span class="spec-k">iOS</span><span class="spec-v">The message's security origin against an allowlist. Main frame only by default.</span></li>
+          <li><span class="spec-k">Android</span><span class="spec-v"><code>allowedOriginRules</code> on the message listener. Main frame only.</span></li>
         </ul>
       </article>
     </div>

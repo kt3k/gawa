@@ -36,14 +36,14 @@ export function layout(opts: {
   body: string;
   base: string;
   version: string;
-  script?: boolean;
 }): string {
   const home = siteUrl(opts.base, "");
   const docs = siteUrl(opts.base, "docs/getting-started/");
   const docsCurrent = opts.path.startsWith("docs/");
-  const script = opts.script
-    ? `\n<script src="${siteUrl(opts.base, "assets/site.js")}" defer></script>`
-    : "";
+  const image = canonicalUrl(opts.base, "og.png");
+  const script = `\n<script src="${
+    siteUrl(opts.base, "assets/site.js")
+  }" defer></script>`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,7 +56,16 @@ export function layout(opts: {
 <meta property="og:description" content="${escapeHtml(opts.description)}">
 <meta property="og:url" content="${canonicalUrl(opts.base, opts.path)}">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#f3efe6">
+<meta property="og:image" content="${image}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="gawa, the shell around a WebView">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${escapeHtml(opts.title)}">
+<meta name="twitter:description" content="${escapeHtml(opts.description)}">
+<meta name="twitter:image" content="${image}">
+<meta name="theme-color" content="#f3efe6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171411" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="${
     siteUrl(opts.base, "favicon.svg")
   }" type="image/svg+xml">

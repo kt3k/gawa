@@ -75,7 +75,9 @@ export async function renderMarkdown(
         return `<h${depth} id="${id}"><a class="heading-link" href="#${id}">${inner}</a></h${depth}>\n`;
       },
       code({ text, lang }: Tokens.Code): string {
-        return highlight(text, lang);
+        return `<div class="codeblock"><button type="button" class="copy" data-copy>Copy</button>${
+          highlight(text, lang)
+        }</div>`;
       },
     },
   });

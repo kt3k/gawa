@@ -143,6 +143,7 @@ try {
     "assets/site.css",
     "assets/site.js",
     "favicon.svg",
+    "og.png",
     "sitemap.xml",
     "robots.txt",
     "404.html",
@@ -232,6 +233,8 @@ try {
     `.package(url: "https://github.com/kt3k/gawa", from: "${version}")`,
     `com.github.kt3k:gawa:v${version}`,
     'maven("https://jitpack.io")',
+    '.product(name: "Gawa", package: "gawa")',
+    "org.jetbrains.kotlin.plugin.serialization",
     "GawaError",
     "https://github.com/kt3k/gawa",
   ];
@@ -242,6 +245,8 @@ try {
       `src="${siteUrl(base, "assets/site.js")}"`,
       'id="install"',
       'id="example"',
+      `property="og:image" content="${canonicalUrl(base, "og.png")}"`,
+      "data-copy",
     ]
   ) {
     if (!homeHtml.includes(needle)) {
@@ -281,6 +286,8 @@ try {
       'id="createbridge"',
       "BridgeOptions",
       "no native host is attached",
+      "On this page",
+      "data-copy",
     ],
     "docs/ios/": [
       'id="gawabridge"',

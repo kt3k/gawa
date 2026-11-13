@@ -76,7 +76,9 @@ on<K extends keyof E & string>(
 `on` listens for a native event and returns a function that stops listening. If the envelope has no `data`, the listener receives `null`. A listener that throws is rethrown on a timer, so the other listeners for that event still run.
 
 ```ts
-const off = bridge.on("back", () => closeDialog());
+const off = bridge.on("back", () => {
+  // Close this page's own UI.
+});
 off();
 ```
 

@@ -99,6 +99,23 @@ function fillVersion(markdown: string, version: string): string {
   );
 }
 
+/** Links to h2 and h3, using the ids the markdown renderer already emitted. */
+function tableOfContents(article: string): string {
+  const heads = [
+    ...article.matchAll(
+      /<h([23]) id="([^"]+)"><a class="heading-link" href="[^"]*">([\s\S]*?)<\/a><\/h\1>/g,
+    ),
+  ];
+  if (heads.length < 2) return "";
+  const items = heads.map((match) => {
+    const text = match[3].replace(/<[^>]+>/g, "");
+    return `<li class="toc-l${match[1]}"><a href="#${
+      match[2]
+    }">${text}</a></li>`;
+  }).join("\n");
+  return `<nav class="toc" aria-label="On this page"><p class="toc-label">On this page</p><ol>\n${items}\n</ol></nav>`;
+}
+
 async function writeFile(path: string, contents: string): Promise<void> {
   await Deno.mkdir(dirname(path), { recursive: true });
   await Deno.writeTextFile(path, contents);
@@ -130,7 +147,6 @@ await writeFile(
     body: landing(version, base),
     base,
     version,
-    script: true,
   }),
 );
 
@@ -143,7 +159,13 @@ for (const page of docs) {
     throw new Error(`${page.file} still contains a version token`);
   }
   let article = await renderMarkdown(markdown, base);
+  const contents = tableOfContents(article);
   if (page.note) article = article.replace("</h1>", `</h1>\n${page.note}`);
+  if (contents) {
+    article = page.note
+      ? article.replace(page.note, `${page.note}\n${contents}`)
+      : article.replace("</h1>", `</h1>\n${contents}`);
+  }
   const html = layout({
     title: `${page.title} — gawa`,
     description: page.description,
@@ -180,6 +202,7 @@ await Deno.copyFile(
   join(root, "static/favicon.svg"),
   join(dist, "favicon.svg"),
 );
+await Deno.copyFile(join(root, "static/og.png"), join(dist, "og.png"));
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

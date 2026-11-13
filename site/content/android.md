@@ -12,12 +12,15 @@ dependencyResolutionManagement {
     }
 }
 // build.gradle.kts
+plugins {
+    id("org.jetbrains.kotlin.plugin.serialization")
+}
 dependencies {
     implementation("com.github.kt3k:gawa:{{tag}}")
 }
 ```
 
-The library depends on AndroidX WebKit, kotlinx.serialization, and kotlinx-coroutines (`api` in `android/gawa/build.gradle.kts`). Apply `org.jetbrains.kotlin.plugin.serialization` in the app. Types that cross the bridge must be `@Serializable`.
+The library depends on AndroidX WebKit, kotlinx.serialization, and kotlinx-coroutines (`api` in `android/gawa/build.gradle.kts`). Types that cross the bridge must be `@Serializable`.
 
 `consumer-rules.pro` notes that gawa looks up serializers with reified `serializer<T>()`. Keep the serializers of the types you pass across the bridge. The kotlinx.serialization plugin's rules cover `@Serializable` types.
 

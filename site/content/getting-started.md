@@ -42,6 +42,12 @@ Swift Package Manager, iOS 15+ / macOS 12+. Add `https://github.com/kt3k/gawa` a
 .package(url: "https://github.com/kt3k/gawa", from: "{{version}}")
 ```
 
+In the app target, depend on the `Gawa` product. The package identity is the repository name:
+
+```swift
+.product(name: "Gawa", package: "gawa")
+```
+
 ### Android
 
 minSdk 24, via [JitPack](https://jitpack.io/#kt3k/gawa). JitPack builds the tag on first request.
@@ -56,12 +62,15 @@ dependencyResolutionManagement {
     }
 }
 // build.gradle.kts
+plugins {
+    id("org.jetbrains.kotlin.plugin.serialization")
+}
 dependencies {
     implementation("com.github.kt3k:gawa:{{tag}}")
 }
 ```
 
-Apply the `org.jetbrains.kotlin.plugin.serialization` Gradle plugin. Types that cross the bridge must be `@Serializable`. See [Android](/docs/android/).
+Types that cross the bridge must be `@Serializable`. See [Android](/docs/android/).
 
 ## Wire it up
 

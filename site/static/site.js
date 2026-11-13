@@ -1,3 +1,41 @@
+async function copyText(text, button) {
+  const value = text.replace(/\n$/, "");
+  try {
+    await navigator.clipboard.writeText(value);
+  } catch {
+    const area = document.createElement("textarea");
+    area.value = value;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.left = "-9999px";
+    document.body.append(area);
+    area.select();
+    document.execCommand("copy");
+    area.remove();
+  }
+  const previous = button.textContent;
+  button.textContent = "Copied";
+  setTimeout(() => {
+    button.textContent = previous;
+  }, 1400);
+}
+
+for (const button of document.querySelectorAll("[data-copy]")) {
+  button.addEventListener("click", () => {
+    const panel = button.closest(".panel");
+    const block = button.closest(".codeblock");
+    const root = panel
+      ? panel.querySelector('[role="tabpanel"]:not([hidden])')
+      : block;
+    const text = root
+      ? [...root.querySelectorAll("pre")].map((pre) => pre.innerText).join(
+        "\n\n",
+      )
+      : "";
+    copyText(text, button);
+  });
+}
+
 for (const root of document.querySelectorAll("[data-tabs]")) {
   const tabs = [...root.querySelectorAll('[role="tab"]')];
   const select = (tab) => {

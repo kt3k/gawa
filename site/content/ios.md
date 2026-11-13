@@ -1,10 +1,18 @@
 # iOS
 
-Swift Package Manager. Platforms: iOS 15+ / macOS 12+. The product and the module are both `Gawa`. Sources: [`ios/Sources/Gawa`](https://github.com/kt3k/gawa/tree/main/ios/Sources/Gawa).
+Swift Package Manager. Platforms: iOS 15+ / macOS 12+. Sources: [`ios/Sources/Gawa`](https://github.com/kt3k/gawa/tree/main/ios/Sources/Gawa).
 
 ```swift
 .package(url: "https://github.com/kt3k/gawa", from: "{{version}}")
 ```
+
+In the app target:
+
+```swift
+.product(name: "Gawa", package: "gawa")
+```
+
+The package identity is the repository name (`gawa`). The product and the module are both `Gawa`.
 
 `GawaBridge` and `GawaRouter` are `@MainActor`. Handlers may be `async`.
 
