@@ -73,4 +73,14 @@ class GawaRouterTest {
         assertEquals("tick", o["event"]!!.jsonPrimitive.content)
         assertEquals(3, o["data"]!!.jsonPrimitive.int)
     }
+
+    @Test
+    fun log() = runTest {
+        val r = router()
+        val lines = mutableListOf<String>()
+        r.log = { lines.add(it) }
+        r.handle("""{"gawa":1,"id":2,"method":"hello"}""")
+        assertTrue(lines.any { it.startsWith("receive ") })
+        assertTrue(lines.any { it.startsWith("reply ") })
+    }
 }

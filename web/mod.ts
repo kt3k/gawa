@@ -79,6 +79,12 @@ export interface BridgeOptions {
   timeout?: number;
   /** The global object to look for the host on (for tests). */
   global?: object;
+  /**
+   * Called with one line per envelope sent or received, and for timeout
+   * and error. Bridges on the same global share the connection, so the
+   * latest `log` passed to `createBridge` is the one that is used.
+   */
+  log?: (line: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -100,6 +106,7 @@ type Global = any;
 
 class Core {
   transport: Transport | null;
+  log?: (line: string) => void;
   nextId = 1;
   pending = new Map<number, Pending>();
   listeners = new Map<string, Set<(data: unknown) => void>>();
@@ -130,13 +137,18 @@ class Core {
     const id = this.nextId++;
     const envelope: Record<string, unknown> = { gawa: PROTOCOL, id, method };
     if (params !== undefined) envelope.params = params;
+    this.log?.(`send ${JSON.stringify(envelope)}`);
     return new Promise((resolve, reject) => {
       const p: Pending = { resolve, reject };
       if (timeout > 0) {
         p.timer = setTimeout(() => {
           this.pending.delete(id);
+          this.log?.(`timeout ${method} #${id} ${timeout}ms`);
           reject(
-            new GawaError("timeout", `${method}: no reply in ${timeout}ms`),
+            new GawaError(
+              "timeout",
+              `${method} #${id}: no reply in ${timeout}ms`,
+            ),
           );
         }, timeout);
       }
@@ -171,6 +183,9 @@ class Core {
     } catch {
       return;
     }
+    this.log?.(
+      `receive ${typeof raw === "string" ? raw : JSON.stringify(raw)}`,
+    );
     if (!m || typeof m !== "object" || m.gawa !== PROTOCOL) return;
     if (typeof m.event === "string") {
       for (const fn of this.listeners.get(m.event) ?? []) {
@@ -193,6 +208,11 @@ class Core {
     this.pending.delete(id);
     clearTimeout(p.timer);
     if (error) {
+      this.log?.(
+        `error #${id} ${String(error.code ?? "internal")}: ${
+          String(error.message ?? "")
+        }`,
+      );
       p.reject(
         new GawaError(
           String(error.code ?? "internal"),
@@ -248,6 +268,7 @@ export function createBridge<
   let core = cores.get(g);
   if (!core) cores.set(g, core = new Core(g));
   const c = core;
+  if (options.log) c.log = options.log;
   const timeout = options.timeout ?? 0;
   return {
     available: c.transport !== null,

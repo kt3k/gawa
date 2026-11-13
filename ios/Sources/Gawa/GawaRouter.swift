@@ -18,6 +18,9 @@ public struct GawaError: Error, Equatable {
 public final class GawaRouter {
     public static let protocolVersion = 1
 
+    /// Optional line logger for each request and reply. Nil by default.
+    public var log: ((String) -> Void)?
+
     /// A handler taking and returning JSON (`nil` means JSON `null`).
     public typealias RawHandler = (_ params: Data?) async throws -> Data?
 
@@ -71,13 +74,17 @@ public final class GawaRouter {
     /// Handles one request envelope (a JSON string) and returns the reply
     /// envelope, or `nil` when the message is not a gawa request.
     public func handle(_ body: String) async -> String? {
+        log?("receive \(body)")
         guard
             let data = body.data(using: .utf8),
             let env = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
             env["gawa"] as? Int == Self.protocolVersion,
             let id = env["id"] as? Int,
             let method = env["method"] as? String
-        else { return nil }
+            else {
+            log?("ignore \(body)")
+            return nil
+        }
 
         var reply: [String: Any] = ["gawa": Self.protocolVersion, "id": id]
         do {
@@ -99,7 +106,9 @@ public final class GawaRouter {
         } catch {
             reply["error"] = ["code": "internal", "message": "\(error)"]
         }
-        return Self.string(reply)
+        let out = Self.string(reply)
+        log?("reply \(out)")
+        return out
     }
 
     /// Builds an event envelope.

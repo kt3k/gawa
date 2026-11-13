@@ -65,7 +65,8 @@ public final class GawaBridge: NSObject, WKScriptMessageHandlerWithReply {
     public init(
         allowedOrigins: [URL],
         allowSubframes: Bool = false,
-        router: GawaRouter? = nil
+        router: GawaRouter? = nil,
+        log: ((String) -> Void)? = nil
     )
     public func attach(to webView: WKWebView)
     public func detach()
@@ -76,6 +77,7 @@ public final class GawaBridge: NSObject, WKScriptMessageHandlerWithReply {
 - `allowedOrigins` — origins (`scheme://host[:port]`) whose pages may use the bridge. For the example scheme handler that is `app://localhost`.
 - `allowSubframes` — also accept messages from iframes. The default is false (main frame only).
 - `router` — an existing router, or a new one when `nil`.
+- `log` — optional `(String) -> Void`. Nil by default. It is also stored on `router`, which logs each request and reply. The bridge logs a rejected message and an emit that is skipped.
 
 `attach(to:)` installs the message handler named `gawa` in the page content world (`WKContentWorld.page`). Call it before loading the page. The web view's user content controller retains the bridge until `detach()`. `detach()` removes the handler. The example app calls it from `dismantleUIView`.
 

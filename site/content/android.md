@@ -94,6 +94,7 @@ public class GawaBridge @MainThread constructor(
     allowedOrigins: Set<String> = setOf(GawaAssets.DEFAULT_ORIGIN),
     public val router: GawaRouter = GawaRouter(),
     scope: CoroutineScope = MainScope(),
+    log: ((String) -> Unit)? = null,
 ) {
     public companion object {
         public const val NAME: String = "gawa"
@@ -109,6 +110,8 @@ public class GawaBridge @MainThread constructor(
 `allowedOrigins` is passed to `WebViewCompat.addWebMessageListener` as `allowedOriginRules`. Only those origins receive the `gawa` object. Only messages from the main frame are handled.
 
 `isSupported()` is `WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)`. The constructor checks it and throws `IllegalStateException` (`"WebView does not support WEB_MESSAGE_LISTENER"`) when the device's WebView does not.
+
+`log` is an optional `(String) -> Unit` at the end of the constructor, null by default. It is stored on `router`, which logs each request and reply. The bridge also logs a received message and an emit that has no listener yet.
 
 Handlers run on `scope` (a `MainScope` by default). The reply is posted on the main thread with `webView.post`. `dispose()` removes the `gawa` object from future pages, drops the event proxy, and cancels the scope. The example activity calls it from `onDestroy`, before `webView.destroy()`.
 

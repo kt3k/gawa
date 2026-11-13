@@ -20,18 +20,23 @@ public final class GawaBridge: NSObject, WKScriptMessageHandlerWithReply {
     public let router: GawaRouter
     private let allowedOrigins: [URL]
     private let allowSubframes: Bool
+    private let log: ((String) -> Void)?
     private weak var webView: WKWebView?
 
     /// - Parameters:
     ///   - allowedOrigins: origins (`scheme://host[:port]`) whose pages may
     ///     use the bridge, e.g. `app://localhost` for `GawaSchemeHandler`.
     ///   - allowSubframes: also accept messages from iframes.
+    ///   - log: optional line logger. Also stored on `router`.
     public init(
-        allowedOrigins: [URL], allowSubframes: Bool = false, router: GawaRouter? = nil
+        allowedOrigins: [URL], allowSubframes: Bool = false, router: GawaRouter? = nil,
+        log: ((String) -> Void)? = nil
     ) {
         self.allowedOrigins = allowedOrigins
         self.allowSubframes = allowSubframes
+        self.log = log
         self.router = router ?? GawaRouter()
+        self.router.log = log
     }
 
     /// Installs the `gawa` message handler on the web view. Call it before
@@ -53,7 +58,11 @@ public final class GawaBridge: NSObject, WKScriptMessageHandlerWithReply {
     /// Sends an event to the page (`bridge.on(event, …)` on the web side).
     /// Does nothing unless the web view shows a page from an allowed origin.
     public func emit<D: Encodable>(_ event: String, _ data: D) throws {
-        guard let webView, let url = webView.url, isAllowed(url) else { return }
+        guard let webView, let url = webView.url, isAllowed(url) else {
+            log?("emit \(event) skipped")
+            return
+        }
+        log?("emit \(event)")
         let envelope = try GawaRouter.eventEnvelope(event, data)
         // Pass the envelope as a JS string literal (JSON-escaped).
         let literal = GawaRouter.string(["s": envelope])
@@ -71,6 +80,7 @@ public final class GawaBridge: NSObject, WKScriptMessageHandlerWithReply {
             isAllowed(message.frameInfo.securityOrigin),
             let body = message.body as? String
         else {
+            log?("reject message")
             replyHandler(nil, "gawa: message rejected")
             return
         }

@@ -67,12 +67,14 @@ class Core {
         const envelope = { gawa: PROTOCOL, id, method };
         if (params !== undefined)
             envelope.params = params;
+        this.log?.(`send ${JSON.stringify(envelope)}`);
         return new Promise((resolve, reject) => {
             const p = { resolve, reject };
             if (timeout > 0) {
                 p.timer = setTimeout(() => {
                     this.pending.delete(id);
-                    reject(new GawaError("timeout", `${method}: no reply in ${timeout}ms`));
+                    this.log?.(`timeout ${method} #${id} ${timeout}ms`);
+                    reject(new GawaError("timeout", `${method} #${id}: no reply in ${timeout}ms`));
                 }, timeout);
             }
             this.pending.set(id, p);
@@ -103,6 +105,7 @@ class Core {
         catch {
             return;
         }
+        this.log?.(`receive ${typeof raw === "string" ? raw : JSON.stringify(raw)}`);
         if (!m || typeof m !== "object" || m.gawa !== PROTOCOL)
             return;
         if (typeof m.event === "string") {
@@ -128,6 +131,7 @@ class Core {
         this.pending.delete(id);
         clearTimeout(p.timer);
         if (error) {
+            this.log?.(`error #${id} ${String(error.code ?? "internal")}: ${String(error.message ?? "")}`);
             p.reject(new GawaError(String(error.code ?? "internal"), String(error.message ?? "")));
         }
         else
@@ -172,6 +176,8 @@ export function createBridge(options = {}) {
     if (!core)
         cores.set(g, core = new Core(g));
     const c = core;
+    if (options.log)
+        c.log = options.log;
     const timeout = options.timeout ?? 0;
     return {
         available: c.transport !== null,

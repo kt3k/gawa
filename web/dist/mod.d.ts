@@ -65,6 +65,12 @@ export interface BridgeOptions {
     timeout?: number;
     /** The global object to look for the host on (for tests). */
     global?: object;
+    /**
+     * Called with one line per envelope sent or received, and for timeout
+     * and error. Bridges on the same global share the connection, so the
+     * latest `log` passed to `createBridge` is the one that is used.
+     */
+    log?: (line: string) => void;
 }
 /**
  * Returns a typed bridge to the native host. Bridges created on the same

@@ -34,6 +34,7 @@ public class GawaBridge @MainThread constructor(
     allowedOrigins: Set<String> = setOf(GawaAssets.DEFAULT_ORIGIN),
     public val router: GawaRouter = GawaRouter(),
     private val scope: CoroutineScope = MainScope(),
+    private val log: ((String) -> Unit)? = null,
 ) {
     public companion object {
         public const val NAME: String = "gawa"
@@ -47,6 +48,7 @@ public class GawaBridge @MainThread constructor(
     private var eventProxy: JavaScriptReplyProxy? = null
 
     init {
+        router.log = log
         check(isSupported()) { "WebView does not support WEB_MESSAGE_LISTENER" }
         WebViewCompat.addWebMessageListener(webView, NAME, allowedOrigins) {
                 _, message, _, isMainFrame, replyProxy ->
@@ -56,6 +58,7 @@ public class GawaBridge @MainThread constructor(
     }
 
     private fun onMessage(body: String, replyProxy: JavaScriptReplyProxy) {
+        log?.invoke("receive $body")
         when (val m = router.parse(body)) {
             is GawaRouter.Incoming.Hello -> eventProxy = replyProxy
             is GawaRouter.Incoming.Request -> scope.launch {
@@ -74,7 +77,11 @@ public class GawaBridge @MainThread constructor(
     /** Sends an event with raw JSON data. Returns false if no page listens. */
     @MainThread
     public fun emitRaw(event: String, data: JsonElement): Boolean {
-        val proxy = eventProxy ?: return false
+        val proxy = eventProxy ?: run {
+            log?.invoke("emit $event skipped")
+            return false
+        }
+        log?.invoke("emit $event")
         proxy.postMessage(router.eventEnvelope(event, data))
         return true
     }

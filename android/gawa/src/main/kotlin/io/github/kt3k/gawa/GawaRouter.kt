@@ -31,6 +31,9 @@ public class GawaRouter(
         public const val PROTOCOL: Int = 1
     }
 
+    /** Optional line logger for each request and reply. Null by default. */
+    public var log: ((String) -> Unit)? = null
+
     @PublishedApi
     internal val handlers: MutableMap<String, suspend (JsonElement) -> JsonElement> =
         mutableMapOf()
@@ -115,12 +118,21 @@ public class GawaRouter(
         } catch (e: Exception) {
             errorEnvelope(id, "internal", e.toString())
         }
-        return reply.toString()
+        val text = reply.toString()
+        log?.invoke("reply $text")
+        return text
     }
 
     /** Handles a raw message; null when it is not a request. */
-    public suspend fun handle(body: String): String? =
-        (parse(body) as? Incoming.Request)?.let { handle(it) }
+    public suspend fun handle(body: String): String? {
+        log?.invoke("receive $body")
+        val request = parse(body) as? Incoming.Request
+        if (request == null) {
+            log?.invoke("ignore $body")
+            return null
+        }
+        return handle(request)
+    }
 
     /** Builds an event envelope. */
     public fun eventEnvelope(event: String, data: JsonElement): String =

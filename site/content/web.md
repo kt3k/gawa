@@ -38,8 +38,9 @@ Namespacing with dots (`kv.get`) is a convention.
 
 ### BridgeOptions
 
-- `timeout` — reject a call that gets no reply within this many milliseconds. `0` means no time limit. The default is `0`. The value applies to `call`s made through the bridge object it was passed to.
+- `timeout` — reject a call that gets no reply within this many milliseconds. `0` means no time limit. The default is `0`. The value applies to `call`s made through the bridge object it was passed to. The error message includes the method and the request id.
 - `global` — the object to look for the host on. For tests. The default is `globalThis`.
+- `log` — called with one line for each envelope sent or received, and for a timeout or error. Bridges on the same global share the connection, so the latest `log` passed to `createBridge` is the one that is used.
 
 ## Calls
 
@@ -98,7 +99,7 @@ Messages from this module:
 | code          | when                                                                        |
 | ------------- | --------------------------------------------------------------------------- |
 | `unavailable` | `call` with no native host. Message: `no native host is attached`.          |
-| `timeout`     | no reply within `timeout` ms. Message: `<method>: no reply in <timeout>ms`. |
+| `timeout`     | no reply within `timeout` ms. Message: `<method> #<id>: no reply in <timeout>ms`. |
 | `internal`    | sending the request threw, or the iOS `postMessage` promise rejected.       |
 
 A native reply `{ "error": { "code", "message" } }` rejects with those fields. A missing `code` becomes `"internal"`. A missing `message` becomes `""`. The shared codes are listed in the [protocol](/docs/protocol/).

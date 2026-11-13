@@ -65,6 +65,16 @@ final class GawaRouterTests: XCTestCase {
         XCTAssertEqual(o["event"] as? String, "tick")
         XCTAssertEqual(o["data"] as? Int, 3)
     }
+
+    func testLog() async {
+        let router = GawaRouter()
+        router.register("hello") { () -> String in "hi" }
+        var lines: [String] = []
+        router.log = { lines.append($0) }
+        _ = await router.handle(#"{"gawa":1,"id":1,"method":"hello"}"#)
+        XCTAssertTrue(lines.contains { $0.hasPrefix("receive ") })
+        XCTAssertTrue(lines.contains { $0.hasPrefix("reply ") })
+    }
 }
 
 final class GawaSchemeHandlerTests: XCTestCase {
