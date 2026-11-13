@@ -1,0 +1,97 @@
+{
+  "native": [
+    {
+      "name": "request with params",
+      "request": { "gawa": 1, "id": 7, "method": "kv.get", "params": { "key": "lang" } },
+      "reply": { "gawa": 1, "id": 7, "result": "ja" }
+    },
+    {
+      "name": "params omitted when the method takes none",
+      "request": { "gawa": 1, "id": 2, "method": "app.version" },
+      "reply": { "gawa": 1, "id": 2, "result": "1.0" }
+    },
+    {
+      "name": "method that returns nothing replies null",
+      "request": {
+        "gawa": 1,
+        "id": 3,
+        "method": "kv.set",
+        "params": { "key": "lang", "value": "ja" }
+      },
+      "reply": { "gawa": 1, "id": 3, "result": null }
+    },
+    {
+      "name": "method may return null",
+      "request": { "gawa": 1, "id": 9, "method": "kv.get", "params": { "key": "missing" } },
+      "reply": { "gawa": 1, "id": 9, "result": null }
+    },
+    {
+      "name": "unknown method",
+      "request": { "gawa": 1, "id": 4, "method": "missing" },
+      "reply": {
+        "gawa": 1,
+        "id": 4,
+        "error": { "code": "unknown_method", "message": "unknown method: missing" }
+      }
+    },
+    {
+      "name": "invalid params",
+      "request": { "gawa": 1, "id": 5, "method": "kv.get", "params": {} },
+      "reply": { "gawa": 1, "id": 5, "error": { "code": "invalid_params" } }
+    },
+    {
+      "name": "null params cannot decode",
+      "request": { "gawa": 1, "id": 10, "method": "kv.get", "params": null },
+      "reply": { "gawa": 1, "id": 10, "error": { "code": "invalid_params" } }
+    },
+    {
+      "name": "handler GawaError is passed through",
+      "request": { "gawa": 1, "id": 6, "method": "app.fail" },
+      "reply": { "gawa": 1, "id": 6, "error": { "code": "nope", "message": "it failed" } }
+    },
+    {
+      "name": "unexpected throw is internal",
+      "request": { "gawa": 1, "id": 8, "method": "app.boom" },
+      "reply": { "gawa": 1, "id": 8, "error": { "code": "internal" } }
+    },
+    {
+      "name": "another protocol version is ignored",
+      "request": { "gawa": 2, "id": 1, "method": "app.version" },
+      "reply": null
+    },
+    {
+      "name": "hello is not a request",
+      "request": { "gawa": 1, "hello": true },
+      "reply": null,
+      "android": "hello"
+    },
+    {
+      "name": "malformed json is ignored",
+      "raw": "not json",
+      "reply": null
+    },
+    {
+      "name": "id must be a json number",
+      "request": { "gawa": 1, "id": "7", "method": "app.version" },
+      "reply": null
+    },
+    {
+      "name": "message without gawa is ignored",
+      "request": { "id": 1, "method": "app.version" },
+      "reply": null
+    }
+  ],
+  "events": [
+    { "event": "back", "data": null }
+  ],
+  "page": {
+    "unavailableMethod": "app.version",
+    "timeoutMs": 30,
+    "timeoutMethod": "app.silent",
+    "ignore": [
+      "not json",
+      { "gawa": 2, "event": "back", "data": 1 },
+      { "id": 999, "result": 1 }
+    ]
+  }
+}

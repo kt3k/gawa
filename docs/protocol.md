@@ -62,3 +62,6 @@ Handlers may throw `GawaError(code, message)` with any other code.
 | reply         | resolution of that `postMessage()` promise                                                              | `message` event on the `gawa` object, via the request's `JavaScriptReplyProxy` |
 | event         | `globalThis.__gawa.receive(json)` via `evaluateJavaScript`                                              | `message` event on the `gawa` object, via the hello's `JavaScriptReplyProxy`   |
 | origin check  | `WKScriptMessage.frameInfo.securityOrigin` against an allowlist; main frame only by default             | `allowedOriginRules` of `addWebMessageListener`; main frame only               |
+
+`protocol/cases.json` is the shared check for this document. CI runs it
+against the web, iOS, and Android implementations.
