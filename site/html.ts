@@ -16,6 +16,7 @@ export const NAV: NavItem[] = [
   { path: "docs/spec/", label: "Spec" },
   { path: "docs/protocol/", label: "Protocol" },
   { path: "docs/releasing/", label: "Releasing" },
+  { path: "docs/maintaining/", label: "Maintaining" },
 ];
 
 export function escapeHtml(text: string): string {

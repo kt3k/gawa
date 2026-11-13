@@ -1,0 +1,8 @@
+# GitHub Actions only. npm, Gradle, and Swift updates stay off until the
+# maintainer asks for them. See docs/harness/backlog.md.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

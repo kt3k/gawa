@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security
+    url: https://github.com/kt3k/gawa/blob/main/CONTRIBUTING.md#security
+    about: Do not include vulnerability details in a public issue. A private contact is not published yet.

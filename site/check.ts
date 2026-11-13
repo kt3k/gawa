@@ -142,6 +142,7 @@ try {
     "docs/protocol/",
     "docs/why/",
     "docs/releasing/",
+    "docs/maintaining/",
     "assets/site.css",
     "assets/site.js",
     "favicon.svg",
@@ -349,6 +350,12 @@ try {
       "jitpack.yml",
       "pages.yml",
     ],
+    "docs/maintaining/": [
+      "docs/harness/README.md",
+      "CONTRIBUTING.md",
+      "scripts/health.ts",
+      "private security contact",
+    ],
   };
   for (const [path, needles] of Object.entries(pages)) {
     const body = html.get(urlFor(path)) ?? "";
@@ -373,6 +380,7 @@ try {
       "docs/spec/",
       "docs/protocol/",
       "docs/releasing/",
+      "docs/maintaining/",
     ]
   ) {
     if (!sitemap.includes(canonicalUrl(base, path))) {

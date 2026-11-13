@@ -228,6 +228,14 @@ own client.
 [docs/protocol.md](docs/protocol.md) is a short map of it and is not a second
 spec.
 
+## Maintaining
+
+[AGENTS.md](AGENTS.md) points a coding agent at
+[docs/harness/](docs/harness/README.md). That is how this repository is meant
+to be improved: small compatible changes, checked with
+`deno run -A scripts/health.ts`. People contributing by hand should start at
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 MIT

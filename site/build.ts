@@ -109,6 +109,15 @@ const docs: DocPage[] = [
     file: "site/content/releasing.md",
     fill: true,
   },
+  {
+    path: "docs/maintaining/",
+    nav: "Maintaining",
+    title: "Maintaining",
+    description:
+      "How gawa is maintained: the spec, compatible changes, and where the contributor guide lives.",
+    file: "site/content/maintaining.md",
+    fill: false,
+  },
 ];
 
 const navPaths = new Set(NAV.map((item) => item.path));
