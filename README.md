@@ -66,9 +66,32 @@ dependencies {
 
 ## Examples
 
-[`examples/`](examples) has a minimal iOS app and Android app showing the same
-bundled page. The page also tests the bridge end to end; CI runs it in a real
-`WKWebView` (macOS) and a real Android `WebView` (emulator).
+[`examples/`](examples) is a minimal iOS app and a minimal Android app showing
+the same bundled page ([`examples/web`](examples/web)). The page also tests the
+bridge end to end; CI runs it in a real `WKWebView` (macOS) and a real Android
+`WebView` (emulator).
+
+Build the page first (requires [Deno](https://deno.com)):
+
+```sh
+examples/web/build.sh   # → examples/web/www/main.js
+```
+
+iOS uses [XcodeGen](https://github.com/yonaskolb/XcodeGen):
+
+```sh
+cd examples/ios
+xcodegen generate
+open GawaExample.xcodeproj
+```
+
+Android: the example is the `:example` module of the Gradle build in `android/`.
+
+```sh
+cd android
+./gradlew :example:installDebug              # device or emulator
+./gradlew :example:connectedDebugAndroidTest # end-to-end test
+```
 
 ## Web
 
