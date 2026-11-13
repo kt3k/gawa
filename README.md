@@ -118,6 +118,16 @@ if (bridge.available) {
 
 Calls reject with `GawaError` (`err.code`, `err.message`).
 
+In a browser with no app, `installMock` stands in for the native host. Call it
+before `createBridge`:
+
+```ts
+import { createBridge, installMock } from "gawa";
+
+installMock({ handlers: { "app.version": () => "1.0" } });
+const bridge = createBridge<Methods, Events>();
+```
+
 ## iOS
 
 Bundle the web build as a folder reference (e.g. `www/`), then:

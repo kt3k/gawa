@@ -71,4 +71,49 @@ export interface BridgeOptions {
  * global share one connection, so this can be called from several modules.
  */
 export declare function createBridge<M extends MethodMap = MethodMap, E extends EventMap = EventMap>(options?: BridgeOptions): Bridge<M, E>;
+/** One call the page made through {@link installMock}. */
+export interface MockCall {
+    method: string;
+    params: unknown;
+}
+export interface MockOptions {
+    /** Which host to imitate. Default `"ios"`. */
+    platform?: Platform;
+    /** Object to install the host on. Default `globalThis`. */
+    global?: object;
+    /**
+     * Methods the mock implements. Return the result, or throw
+     * {@link GawaError} for an app-defined error. A thrown value that is not
+     * a `GawaError` becomes `internal`. Unknown methods reply `unknown_method`.
+     */
+    handlers?: Record<string, (params: unknown) => unknown | Promise<unknown>>;
+}
+export interface MockNative {
+    /** Calls received since installation, in order. */
+    readonly calls: MockCall[];
+    /** Deliver an event. Create the bridge first, so it can receive it. */
+    emit(event: string, data?: unknown): void;
+    /** Remove the host this mock installed. */
+    uninstall(): void;
+}
+/**
+ * Installs a fake native host so a page can call `createBridge` in a normal
+ * browser. Call this before `createBridge` on the same global: the bridge
+ * looks for the host when it is created.
+ *
+ * ```ts
+ * import { createBridge, installMock } from "gawa";
+ *
+ * const mock = installMock({
+ *   handlers: {
+ *     "app.version": () => "1.0",
+ *   },
+ * });
+ * const bridge = createBridge<{ "app.version": () => string }>();
+ * await bridge.call("app.version"); // "1.0"
+ * mock.emit("back", null);
+ * mock.uninstall();
+ * ```
+ */
+export declare function installMock(options?: MockOptions): MockNative;
 export {};

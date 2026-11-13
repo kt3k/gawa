@@ -257,3 +257,139 @@ export function createBridge<
     on: (event, listener) => c.on(event, listener as (d: unknown) => void),
   };
 }
+
+/** One call the page made through {@link installMock}. */
+export interface MockCall {
+  method: string;
+  params: unknown;
+}
+
+export interface MockOptions {
+  /** Which host to imitate. Default `"ios"`. */
+  platform?: Platform;
+  /** Object to install the host on. Default `globalThis`. */
+  global?: object;
+  /**
+   * Methods the mock implements. Return the result, or throw
+   * {@link GawaError} for an app-defined error. A thrown value that is not
+   * a `GawaError` becomes `internal`. Unknown methods reply `unknown_method`.
+   */
+  handlers?: Record<string, (params: unknown) => unknown | Promise<unknown>>;
+}
+
+export interface MockNative {
+  /** Calls received since installation, in order. */
+  readonly calls: MockCall[];
+  /** Deliver an event. Create the bridge first, so it can receive it. */
+  emit(event: string, data?: unknown): void;
+  /** Remove the host this mock installed. */
+  uninstall(): void;
+}
+
+/**
+ * Installs a fake native host so a page can call `createBridge` in a normal
+ * browser. Call this before `createBridge` on the same global: the bridge
+ * looks for the host when it is created.
+ *
+ * ```ts
+ * import { createBridge, installMock } from "gawa";
+ *
+ * const mock = installMock({
+ *   handlers: {
+ *     "app.version": () => "1.0",
+ *   },
+ * });
+ * const bridge = createBridge<{ "app.version": () => string }>();
+ * await bridge.call("app.version"); // "1.0"
+ * mock.emit("back", null);
+ * mock.uninstall();
+ * ```
+ */
+export function installMock(options: MockOptions = {}): MockNative {
+  const platform = options.platform ?? "ios";
+  // deno-lint-ignore no-explicit-any
+  const g = (options.global ?? globalThis) as any;
+  const handlers = options.handlers ?? {};
+  const calls: MockCall[] = [];
+  const listeners: ((e: { data: string }) => void)[] = [];
+  const dispatch = (data: string) => {
+    queueMicrotask(() => listeners.forEach((fn) => fn({ data })));
+  };
+
+  const respond = async (body: string): Promise<string | undefined> => {
+    const req = JSON.parse(body);
+    if (req.hello) return;
+    calls.push({ method: req.method, params: req.params });
+    const id = req.id;
+    try {
+      const handler = handlers[req.method];
+      if (!handler) {
+        return JSON.stringify({
+          gawa: PROTOCOL,
+          id,
+          error: {
+            code: "unknown_method",
+            message: `unknown method: ${req.method}`,
+          },
+        });
+      }
+      const result = await handler(req.params);
+      return JSON.stringify({ gawa: PROTOCOL, id, result: result ?? null });
+    } catch (e) {
+      const code = e instanceof GawaError ? e.code : "internal";
+      const message = e instanceof GawaError
+        ? e.message
+        : String((e as Error)?.message ?? e);
+      return JSON.stringify({ gawa: PROTOCOL, id, error: { code, message } });
+    }
+  };
+
+  let uninstall = () => {};
+  if (platform === "ios") {
+    const prevWebkit = g.webkit;
+    const postMessage = (body: string) => respond(body);
+    if (prevWebkit?.messageHandlers) {
+      const prev = prevWebkit.messageHandlers.gawa;
+      prevWebkit.messageHandlers.gawa = { postMessage };
+      uninstall = () => {
+        if (prev === undefined) delete prevWebkit.messageHandlers.gawa;
+        else prevWebkit.messageHandlers.gawa = prev;
+      };
+    } else {
+      g.webkit = { messageHandlers: { gawa: { postMessage } } };
+      uninstall = () => {
+        g.webkit = prevWebkit;
+      };
+    }
+  } else {
+    const prev = g.gawa;
+    g.gawa = {
+      postMessage(body: string) {
+        respond(body).then((reply) => {
+          if (reply !== undefined) dispatch(reply);
+        });
+      },
+      addEventListener(_type: string, fn: (e: { data: string }) => void) {
+        listeners.push(fn);
+      },
+    };
+    uninstall = () => {
+      if (prev === undefined) delete g.gawa;
+      else g.gawa = prev;
+    };
+  }
+
+  return {
+    calls,
+    emit(event, data) {
+      const json = JSON.stringify({
+        gawa: PROTOCOL,
+        event,
+        data: data === undefined ? null : data,
+      });
+      if (platform === "ios") g.__gawa?.receive(json);
+      else dispatch(json);
+    },
+    uninstall,
+  };
+}

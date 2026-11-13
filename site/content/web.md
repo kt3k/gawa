@@ -112,6 +112,27 @@ The host is detected automatically. iOS is checked first.
 
 In a normal browser there is no host: `available` is false, `platform` is null, and `call` rejects with `unavailable`. Fall back to web APIs there.
 
+## Developing without the app
+
+`installMock` puts a fake iOS or Android host on a global, so the page can be developed in a browser. Call it before `createBridge` on that global. The bridge looks for the host when it is created.
+
+```ts
+import { createBridge, installMock } from "gawa";
+
+const mock = installMock({
+  handlers: {
+    "app.version": () => "1.0",
+    "kv.get": (p) => localStorage.getItem((p as { key: string }).key),
+  },
+});
+const bridge = createBridge<Methods, Events>();
+await bridge.call("app.version"); // "1.0"
+mock.emit("back", null); // bridge.on("back", …)
+mock.uninstall();
+```
+
+`handlers` return the result, or throw `GawaError` for an app-defined code. Anything else becomes `internal`. A method with no handler replies `unknown_method`. `platform` defaults to `"ios"`; pass `"android"` to imitate that transport, including the hello message. `calls` lists what the page sent. `emit` delivers an event after the bridge exists.
+
 ```ts
 const bridge = createBridge<Methods, Events>({ timeout: 10_000 });
 ```
