@@ -9,6 +9,7 @@ export interface NavItem {
 export const NAV: NavItem[] = [
   { path: "", label: "Overview" },
   { path: "docs/getting-started/", label: "Getting started" },
+  { path: "docs/why/", label: "Why gawa" },
   { path: "docs/web/", label: "Web" },
   { path: "docs/ios/", label: "iOS" },
   { path: "docs/android/", label: "Android" },

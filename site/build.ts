@@ -41,6 +41,15 @@ const docs: DocPage[] = [
     fill: true,
   },
   {
+    path: "docs/why/",
+    nav: "Why gawa",
+    title: "Why gawa",
+    description:
+      "How gawa differs from Capacitor, Hotwire Native, Tauri, and smaller WebView bridges.",
+    file: "site/content/why.md",
+    fill: false,
+  },
+  {
     path: "docs/web/",
     nav: "Web",
     title: "Web",

@@ -96,11 +96,11 @@ class GawaError extends Error {
 
 Messages from this module:
 
-| code          | when                                                                        |
-| ------------- | --------------------------------------------------------------------------- |
-| `unavailable` | `call` with no native host. Message: `no native host is attached`.          |
+| code          | when                                                                              |
+| ------------- | --------------------------------------------------------------------------------- |
+| `unavailable` | `call` with no native host. Message: `no native host is attached`.                |
 | `timeout`     | no reply within `timeout` ms. Message: `<method> #<id>: no reply in <timeout>ms`. |
-| `internal`    | sending the request threw, or the iOS `postMessage` promise rejected.       |
+| `internal`    | sending the request threw, or the iOS `postMessage` promise rejected.             |
 
 A native reply `{ "error": { "code", "message" } }` rejects with those fields. A missing `code` becomes `"internal"`. A missing `message` becomes `""`. The shared codes are listed in the [protocol](/docs/protocol/).
 

@@ -43,6 +43,7 @@ export function landing(version: string, base: string): string {
   const originDoc = siteUrl(base, "docs/ios/#serving-the-page");
   const callDoc = siteUrl(base, "docs/web/#calls");
   const securityDoc = siteUrl(base, "docs/protocol/#transports");
+  const why = siteUrl(base, "docs/why/");
   const tag = `v${version}`;
   const install = tabset("install", "Install", [
     {
@@ -256,7 +257,7 @@ bridge.emit("back", null as String?)
     <h2 class="section-title">Quick example</h2>
     <p class="section-intro">Describe what the app implements. The same method names are registered on the native side.</p>
     ${example}
-    <p class="caption">Calls reject with <code>GawaError</code> (<code>err.code</code>, <code>err.message</code>). In a normal browser, <code>available</code> is false.</p>
+    <p class="caption">Calls reject with <code>GawaError</code> (<code>err.code</code>, <code>err.message</code>). In a normal browser, <code>available</code> is false. <a href="${why}">Why gawa, next to Capacitor and others</a>.</p>
   </section>
 
   <section class="close">
