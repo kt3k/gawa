@@ -23,6 +23,8 @@ jobs:
         working-directory: web
       - name: web/dist is up to date with web/mod.ts
         run: web/build.sh && git diff --exit-code -- web/dist
+      - name: package.json and Android version match
+        run: deno run -A scripts/check-versions.ts
       - name: generated bridge types match schema/example.json
         run: >-
           deno run -A schema/generate.ts &&

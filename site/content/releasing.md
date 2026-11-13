@@ -1,10 +1,11 @@
 # Releasing
 
-npm, Deno, Swift Package Manager, and JitPack all consume a git tag. Nothing is published to a package registry from this repo.
+Deno, Swift Package Manager, and JitPack install from a git tag. npm can install from that tag too. Pushing the tag also publishes to the npm registry when the `NPM_TOKEN` secret is set.
 
-1. Bump the version in `package.json` and the default in `android/gawa/build.gradle.kts` (`findProperty("publishVersion") ?: "…"`).
-2. Run `web/build.sh` and commit `web/dist`. CI fails if that directory is stale: the web job runs `web/build.sh && git diff --exit-code -- web/dist`.
-3. Tag `vX.Y.Z` and push the tag.
+1. Bump the version in `package.json` and the default in `android/gawa/build.gradle.kts` (`findProperty("publishVersion") ?: "…"`). CI checks that those two strings match.
+2. Add a `## X.Y.Z` section to `CHANGELOG.md`.
+3. Run `web/build.sh` and commit `web/dist`. CI fails if that directory is stale: the web job runs `web/build.sh && git diff --exit-code -- web/dist`.
+4. Tag `vX.Y.Z` and push the tag. [`.github/workflows/release.yml`](https://github.com/kt3k/gawa/blob/main/.github/workflows/release.yml) checks the tag against `package.json` and `CHANGELOG.md`, then creates the GitHub Release from that changelog section.
 
 `web/build.sh` compiles `web/mod.ts` to `web/dist/mod.js` and `web/dist/mod.d.ts` with `tsc` (`--target es2020`), run via Deno. `package.json` lists those files in `files` and points `exports` at them, which is why `npm install github:kt3k/gawa#vX.Y.Z` works from the tag.
 

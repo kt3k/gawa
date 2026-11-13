@@ -197,8 +197,10 @@ own client.
 1. Bump the version in `package.json` and the default in
    `android/gawa/build.gradle.kts`.
 2. Run `web/build.sh` and commit `web/dist` (CI fails if it is stale).
-3. Tag `vX.Y.Z` and push the tag. npm, Deno, Swift Package Manager and JitPack
-   all consume the tag directly.
+3. Add a `## X.Y.Z` section to `CHANGELOG.md`.
+4. Tag `vX.Y.Z` and push the tag. Deno, Swift Package Manager, and JitPack
+   consume the tag. The release workflow creates the GitHub Release from the
+   changelog and publishes to npm when `NPM_TOKEN` is set.
 
 ## Protocol
 

@@ -1,0 +1,53 @@
+# Tag vX.Y.Z creates a GitHub Release from CHANGELOG.md.
+# npm publish runs only when the NPM_TOKEN secret is set.
+# Deno, Swift Package Manager, and JitPack install from the tag itself.
+
+name: release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Versions match the tag
+        run: deno run -A scripts/check-versions.ts
+
+      - name: Release notes
+        id: notes
+        run: |
+          deno run -A scripts/release-notes.ts "${GITHUB_REF_NAME}" > notes.md
+          echo "path=notes.md" >> "$GITHUB_OUTPUT"
+
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --notes-file notes.md
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "${NODE_AUTH_TOKEN}" ]; then
+            echo "NPM_TOKEN is not set; skipping npm publish"
+            exit 0
+          fi
+          npm publish --access public
