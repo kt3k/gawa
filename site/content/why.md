@@ -4,6 +4,10 @@ gawa is a small library you attach to a `WKWebView` or Android `WebView` that is
 
 The notes below come from a survey of similar projects in November 2026 ([`docs/comparison.md`](https://github.com/kt3k/gawa/blob/main/docs/comparison.md)). The survey looked at public source. It did not find a project that, at the same time, typed the calls through to plain Swift and Kotlin, used `WKScriptMessageHandlerWithReply` and `addWebMessageListener`, served files from a real origin and checked that origin, and could be added to an existing app. That is a statement about the projects that were reviewed, not a claim that no other design exists.
 
+## Make your own
+
+The recommended way to use gawa is to implement [SPEC.md](https://github.com/kt3k/gawa/blob/main/SPEC.md), not to take a dependency on these packages. The npm, Deno, Swift Package Manager, and JitPack packages are a reference implementation of that spec. A page, an iOS host, an Android host, or another platform can be written again from the spec, and [`protocol/cases.json`](https://github.com/kt3k/gawa/blob/main/protocol/cases.json) checks that it still speaks protocol version 1. The packages stay available for when you want the reference instead.
+
 ## What gawa keeps small
 
 - The page API is `createBridge`, `call`, and `on`.

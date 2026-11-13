@@ -12,6 +12,7 @@ import { basePath, canonicalUrl, GITHUB, siteUrl } from "./base.ts";
 import { docsBody, layout, markCurrent, NAV } from "./html.ts";
 import { landing } from "./landing.ts";
 import { renderMarkdown } from "./markdown.ts";
+import { promptBlock } from "./prompt.ts";
 
 const root = import.meta.dirname;
 if (!root) throw new Error("import.meta.dirname is missing");
@@ -28,6 +29,8 @@ interface DocPage {
   /** Substitute {{version}} and {{tag}}. The protocol page stays verbatim. */
   fill: boolean;
   note?: string;
+  /** HTML inserted after the title note and before the table of contents. */
+  lead?: string;
 }
 
 const docs: DocPage[] = [
@@ -74,14 +77,28 @@ const docs: DocPage[] = [
     fill: true,
   },
   {
+    path: "docs/spec/",
+    nav: "Spec",
+    title: "Spec",
+    description:
+      "The normative gawa specification: wire protocol, page, router, and the iOS and Android profiles.",
+    file: "SPEC.md",
+    fill: false,
+    note:
+      `<p class="source-note">Rendered from <a href="${GITHUB}/blob/main/SPEC.md">SPEC.md</a>. This is the document to hand to a coding agent.</p>`,
+    lead:
+      `<p>Paste this into a coding agent. The recommended way to use gawa is to implement the spec yourself. The packages in this repository are the reference implementation.</p>\n${promptBlock()}`,
+  },
+  {
     path: "docs/protocol/",
     nav: "Protocol",
     title: "Protocol",
-    description: "JSON envelopes for gawa protocol version 1.",
+    description:
+      "A short map of gawa protocol version 1. The normative text is SPEC.md.",
     file: "docs/protocol.md",
     fill: false,
     note:
-      `<p class="source-note">Rendered from <a href="${GITHUB}/blob/main/docs/protocol.md">docs/protocol.md</a>.</p>`,
+      `<p class="source-note">Rendered from <a href="${GITHUB}/blob/main/docs/protocol.md">docs/protocol.md</a>. Normative text: <a href="${GITHUB}/blob/main/SPEC.md">SPEC.md</a>.</p>`,
   },
   {
     path: "docs/releasing/",
@@ -169,12 +186,8 @@ for (const page of docs) {
   }
   let article = await renderMarkdown(markdown, base);
   const contents = tableOfContents(article);
-  if (page.note) article = article.replace("</h1>", `</h1>\n${page.note}`);
-  if (contents) {
-    article = page.note
-      ? article.replace(page.note, `${page.note}\n${contents}`)
-      : article.replace("</h1>", `</h1>\n${contents}`);
-  }
+  const tail = [page.note, page.lead, contents].filter(Boolean).join("\n");
+  if (tail) article = article.replace("</h1>", `</h1>\n${tail}`);
   const html = layout({
     title: `${page.title} — gawa`,
     description: page.description,

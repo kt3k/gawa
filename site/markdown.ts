@@ -45,14 +45,17 @@ export function highlight(code: string, lang: string | undefined): string {
   }</code></pre>\n`;
 }
 
+/**
+ * GitHub-style slug, so links written for SPEC.md on GitHub resolve on this
+ * site too. Punctuation is removed (`4.1` becomes `41`) rather than turned
+ * into a hyphen.
+ */
 function uniqueSlug(text: string, used: Map<string, number>): string {
   const base = text
-    .replace(/`([^`]*)`/g, "$1")
     .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "") || "section";
+    .replace(/[^\w\u00C0-\u024F\u1E00-\u1EFF -]/g, "")
+    .trim()
+    .replace(/\s+/g, "-") || "section";
   const seen = used.get(base) ?? 0;
   used.set(base, seen + 1);
   return seen === 0 ? base : `${base}-${seen}`;

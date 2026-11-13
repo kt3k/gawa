@@ -1,6 +1,7 @@
 import { GITHUB, siteUrl } from "./base.ts";
 import { escapeHtml } from "./html.ts";
 import { highlight } from "./markdown.ts";
+import { promptBlock, SPEC_URL } from "./prompt.ts";
 
 function blocks(parts: { lang: string; code: string }[]): string {
   return parts.map((part) => highlight(part.code, part.lang)).join("");
@@ -42,8 +43,9 @@ export function landing(version: string, base: string): string {
   const started = siteUrl(base, "docs/getting-started/");
   const originDoc = siteUrl(base, "docs/ios/#serving-the-page");
   const callDoc = siteUrl(base, "docs/web/#calls");
-  const securityDoc = siteUrl(base, "docs/protocol/#transports");
+  const securityDoc = siteUrl(base, "docs/spec/#7-transports");
   const why = siteUrl(base, "docs/why/");
+  const specPage = siteUrl(base, "docs/spec/");
   const tag = `v${version}`;
   const install = tabset("install", "Install", [
     {
@@ -248,7 +250,14 @@ bridge.emit("back", null as String?)
 
   <section id="install">
     <h2 class="section-title">Install</h2>
-    <p class="section-intro">Everything is installed straight from a git tag — no registry needed.</p>
+    <p class="section-intro">Build a compatible gawa from the spec, or use the reference packages in this repository.</p>
+    <p class="option-kicker">Option 1 · recommended</p>
+    <h3 class="option-title">Make your own</h3>
+    <p class="section-intro">Tell a coding agent to implement <a href="${SPEC_URL}">SPEC.md</a>. It can target the web page, iOS, Android, or another platform. <a href="${specPage}">The spec page</a> has the same prompt.</p>
+    ${promptBlock()}
+    <p class="option-kicker">Option 2</p>
+    <h3 class="option-title">Use the reference implementation</h3>
+    <p class="section-intro">These packages are the implementation in this repository. They install straight from a git tag — no registry needed.</p>
     ${install}
     <p class="caption">The npm package name is <code>gawa</code> (the committed <code>web/dist</code>). Swift Package Manager uses the <code>Gawa</code> product, iOS 15+ / macOS 12+. Android is minSdk 24, built by <a href="https://jitpack.io/#kt3k/gawa">JitPack</a> on first request.</p>
   </section>

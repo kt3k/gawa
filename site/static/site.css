@@ -306,6 +306,24 @@ main:focus {
   max-width: 40rem;
 }
 
+.option-kicker {
+  margin: 1.75rem 0 0.2rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--seal);
+}
+
+.option-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.65rem;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0 0 0.45rem;
+}
+
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -677,6 +695,12 @@ pre code {
   background: transparent;
   color: var(--code-fg);
   border-radius: 0 0 14px 14px;
+}
+
+/* The agent prompt is prose, not a program. Keep it on the screen. */
+.codeblock code.language-plaintext {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .copy {

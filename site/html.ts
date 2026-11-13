@@ -13,6 +13,7 @@ export const NAV: NavItem[] = [
   { path: "docs/web/", label: "Web" },
   { path: "docs/ios/", label: "iOS" },
   { path: "docs/android/", label: "Android" },
+  { path: "docs/spec/", label: "Spec" },
   { path: "docs/protocol/", label: "Protocol" },
   { path: "docs/releasing/", label: "Releasing" },
 ];

@@ -138,7 +138,9 @@ try {
     "docs/web/",
     "docs/ios/",
     "docs/android/",
+    "docs/spec/",
     "docs/protocol/",
+    "docs/why/",
     "docs/releasing/",
     "assets/site.css",
     "assets/site.js",
@@ -237,6 +239,10 @@ try {
     "org.jetbrains.kotlin.plugin.serialization",
     "GawaError",
     "https://github.com/kt3k/gawa",
+    "https://github.com/kt3k/gawa/blob/main/SPEC.md",
+    "Implement gawa according to the following spec:",
+    "Make your own",
+    "Use the reference implementation",
   ];
   const homeHtml = html.get(urlFor("")) ?? "";
   for (
@@ -263,6 +269,8 @@ try {
   for (
     const needle of [
       "Messages are JSON strings.",
+      "not a second spec",
+      "https://github.com/kt3k/gawa/blob/main/SPEC.md",
       "unknown_method",
       "invalid_params",
       "unavailable",
@@ -270,14 +278,35 @@ try {
       "JavaScriptReplyProxy",
       "__gawa.receive",
       "allowedOriginRules",
-      'id="page-native"',
-      'id="hello-android-only"',
-      'id="transports"',
       "docs/protocol.md",
     ]
   ) {
     if (!protocol.includes(needle)) {
       fail(`protocol page missing ${JSON.stringify(needle)}`);
+    }
+  }
+
+  const spec = html.get(urlFor("docs/spec/")) ?? "";
+  for (
+    const needle of [
+      "SPEC.md",
+      "data-copy",
+      "Implement gawa according to the following spec:",
+      "unknown_method",
+      "invalid_params",
+      "unavailable",
+      "timeout",
+      "JavaScriptReplyProxy",
+      "__gawa.receive",
+      "allowedOriginRules",
+      'id="7-transports"',
+      'id="42-hello-android-transport-only"',
+      'id="12-conformance-tests"',
+      "protocol/cases.json",
+    ]
+  ) {
+    if (!spec.includes(needle)) {
+      fail(`spec page missing ${JSON.stringify(needle)}`);
     }
   }
 
@@ -305,6 +334,14 @@ try {
       "examples/web/build.sh",
       "xcodegen",
       "connectedDebugAndroidTest",
+      "Option 1. Make your own",
+      "https://github.com/kt3k/gawa/blob/main/SPEC.md",
+    ],
+    "docs/why/": [
+      "Make your own",
+      "reference implementation",
+      "SPEC.md",
+      "protocol/cases.json",
     ],
     "docs/releasing/": [
       "web/build.sh",
@@ -333,6 +370,7 @@ try {
     const path of [
       "",
       "docs/getting-started/",
+      "docs/spec/",
       "docs/protocol/",
       "docs/releasing/",
     ]

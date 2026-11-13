@@ -3,6 +3,7 @@
 > **gawa** (側) — the shell around something.
 
 Documentation: <https://kt3k.github.io/gawa/>
+Specification: <https://github.com/kt3k/gawa/blob/main/SPEC.md>
 
 A thin, typed bridge between a web page and the native iOS / Android app that
 hosts it in a WebView. Nothing more: no runtime, no plugin system, no CLI, no
@@ -19,9 +20,28 @@ opinion about your screens.
 It works in an app you already have — add a `WKWebView` / `WebView` anywhere and
 attach gawa to it.
 
-## Install
+## Option 1. Make your own
 
-Everything is installed straight from a git tag — no registry needed.
+This is the recommended way to use gawa. The behavior is specified in
+[SPEC.md](https://github.com/kt3k/gawa/blob/main/SPEC.md). Hand that file to a
+coding agent and it can implement a compatible gawa in the language and
+platform you want: the web page, iOS, Android, or another host.
+[`protocol/cases.json`](protocol/cases.json) is the conformance check (section
+12 of the spec).
+
+```text
+Implement gawa according to the following spec:
+https://github.com/kt3k/gawa/blob/main/SPEC.md
+
+Read that spec and implement the roles you need — page, router, and the iOS and/or Android profile, or another platform — so the result is compatible with the reference. Check it with protocol/cases.json as section 12 describes:
+https://github.com/kt3k/gawa/blob/main/protocol/cases.json
+```
+
+## Option 2. Use the reference implementation
+
+The packages in this repository are one implementation of the spec. Use them
+when you want that code instead of writing your own. Everything is installed
+straight from a git tag — no registry needed.
 
 **Web** (npm / pnpm / yarn): the compiled `web/dist` is committed.
 
@@ -202,9 +222,11 @@ own client.
    consume the tag. The release workflow creates the GitHub Release from the
    changelog and publishes to npm when `NPM_TOKEN` is set.
 
-## Protocol
+## Specification
 
-See [docs/protocol.md](docs/protocol.md).
+[SPEC.md](SPEC.md) is the normative specification.
+[docs/protocol.md](docs/protocol.md) is a short map of it and is not a second
+spec.
 
 ## License
 

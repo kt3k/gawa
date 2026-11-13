@@ -10,7 +10,25 @@ It does three things:
 
 ## Install
 
-Everything is installed straight from a git tag. The version below is `package.json`'s `version`.
+Build it from the spec, or use the reference packages. The version below is `package.json`'s `version`.
+
+### Option 1. Make your own
+
+[SPEC.md](https://github.com/kt3k/gawa/blob/main/SPEC.md) is enough to implement a compatible gawa for the web, iOS, Android, or another platform. Paste this into a coding agent:
+
+```text
+Implement gawa according to the following spec:
+https://github.com/kt3k/gawa/blob/main/SPEC.md
+
+Read that spec and implement the roles you need — page, router, and the iOS and/or Android profile, or another platform — so the result is compatible with the reference. Check it with protocol/cases.json as section 12 describes:
+https://github.com/kt3k/gawa/blob/main/protocol/cases.json
+```
+
+Conformance is [`protocol/cases.json`](https://github.com/kt3k/gawa/blob/main/protocol/cases.json), described in section 12 of the spec. The [spec page](/docs/spec/) renders SPEC.md and has a button that copies the prompt.
+
+### Option 2. Use the reference implementation
+
+These packages are the implementation in this repository. They install from a git tag.
 
 ### Web (npm / pnpm / yarn)
 
@@ -114,7 +132,8 @@ cd android
 
 ## Next
 
+- [Spec](/docs/spec/) — the normative specification
 - [Web](/docs/web/) — `createBridge`, calls, events, errors
 - [iOS](/docs/ios/) — `GawaSchemeHandler`, `GawaBridge`, `GawaRouter`
 - [Android](/docs/android/) — `GawaAssets`, `GawaBridge`, `GawaRouter`
-- [Protocol](/docs/protocol/) — the JSON envelopes
+- [Protocol](/docs/protocol/) — a short map of the spec
