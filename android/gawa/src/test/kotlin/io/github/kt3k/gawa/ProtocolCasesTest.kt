@@ -37,10 +37,12 @@ class ProtocolCasesTest {
         val router = router()
         for (c in cases("native")) {
             val name = c["name"]!!.jsonPrimitive.content
-            val raw = (c["raw"] as? JsonPrimitive)?.contentOrNull
+            val rawPrim = c["raw"] as? JsonPrimitive
+            val raw = if (rawPrim != null && rawPrim !is JsonNull) rawPrim.content else null
             val body = raw ?: c["request"]!!.toString()
             val reply = c["reply"]
-            if (c["android"]?.jsonPrimitive?.contentOrNull == "hello") {
+            val android = c["android"] as? JsonPrimitive
+            if (android != null && android !is JsonNull && android.content == "hello") {
                 assertTrue(name, router.parse(body) is GawaRouter.Incoming.Hello)
             }
             if (reply == null || reply is JsonNull) {

@@ -26,7 +26,12 @@ final class ProtocolCasesTests: XCTestCase {
         let suite = try loadSuite()
         let router = router()
         for c in suite.native {
-            let body = c.raw ?? (try encode(c.request!))
+            let body: String
+            if let raw = c.raw {
+                body = raw
+            } else {
+                body = try encode(c.request!)
+            }
             let out = await router.handle(body)
             if isNull(c.reply) {
                 XCTAssertNil(out, c.name)
@@ -45,7 +50,7 @@ final class ProtocolCasesTests: XCTestCase {
         let suite = try loadSuite()
         for event in suite.events {
             let raw = try GawaRouter.eventEnvelope(event.event, event.data as String?)
-            let actual = try jsonObject(raw)
+            let actual = try jsonObject(raw) as! [String: Any]
             XCTAssertEqual(actual["gawa"] as? Int, 1, event.event)
             XCTAssertEqual(actual["event"] as? String, event.event)
             if event.data == nil {
@@ -102,13 +107,12 @@ final class ProtocolCasesTests: XCTestCase {
         guard
             var act = actual as? [String: Any],
             let exp = expected as? [String: Any],
-            var expErr = exp["error"] as? [String: Any],
+            let expErr = exp["error"] as? [String: Any],
             var actErr = act["error"] as? [String: Any],
             expErr["message"] == nil
         else { return actual }
         actErr.removeValue(forKey: "message")
         act["error"] = actErr
-        _ = expErr
         return act
     }
 
