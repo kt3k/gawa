@@ -1,0 +1,17 @@
+{
+  "tasks": {
+    "build": "deno run --allow-read --allow-write --allow-env build.ts",
+    "check": "deno task build && deno run --allow-read --allow-net --allow-env check.ts"
+  },
+  "imports": {
+    "highlight.js": "npm:highlight.js@11.11.1",
+    "marked": "npm:marked@15.0.12"
+  },
+  "fmt": {
+    "exclude": ["dist/"],
+    "proseWrap": "preserve"
+  },
+  "lint": {
+    "exclude": ["dist/"]
+  }
+}

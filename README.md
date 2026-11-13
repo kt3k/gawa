@@ -2,6 +2,8 @@
 
 > **gawa** (側) — the shell around something.
 
+Documentation: <https://kt3k.github.io/gawa/>
+
 A thin, typed bridge between a web page and the native iOS / Android app that
 hosts it in a WebView. Nothing more: no runtime, no plugin system, no CLI, no
 opinion about your screens.

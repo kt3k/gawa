@@ -1,0 +1,71 @@
+# Builds site/ and deploys it to GitHub Pages.
+# Project site: https://kt3k.github.io/gawa/
+# The repository Pages source has to be "GitHub Actions".
+
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# contents: read for checkout. pages + id-token for the official deploy action.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One Pages deployment at a time. Don't cancel one that is already publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build the site and check links
+        working-directory: site
+        env:
+          # "/gawa" for this project site, empty for a user/org site.
+          # site/base.ts accepts either form.
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: |
+          echo "base_path=${BASE_PATH}"
+          case "$BASE_PATH" in
+            /gawa|/gawa/) ;;
+            *)
+              echo "expected Pages base path /gawa, got '${BASE_PATH}'" >&2
+              exit 1
+              ;;
+          esac
+          deno task check
+          grep -q 'href="/gawa/assets/site.css"' dist/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

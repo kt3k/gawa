@@ -11,3 +11,5 @@ android/local.properties
 *.iml
 examples/web/www/main.js
 examples/ios/GawaExample.xcodeproj/
+# Site build output (GitHub Pages publishes the workflow artifact)
+site/dist/

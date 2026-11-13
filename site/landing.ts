@@ -1,0 +1,251 @@
+import { GITHUB, siteUrl } from "./base.ts";
+import { escapeHtml } from "./html.ts";
+import { highlight } from "./markdown.ts";
+
+function blocks(parts: { lang: string; code: string }[]): string {
+  return parts.map((part) => highlight(part.code, part.lang)).join("");
+}
+
+function tabset(
+  name: string,
+  label: string,
+  items: { id: string; label: string; html: string }[],
+): string {
+  const buttons = items.map((item, index) => {
+    const selected = index === 0;
+    const id = `${name}-${item.id}`;
+    return `<button type="button" class="tab" role="tab" id="tab-${id}" aria-selected="${selected}" aria-controls="panel-${id}" tabindex="${
+      selected ? "0" : "-1"
+    }">${escapeHtml(item.label)}</button>`;
+  }).join("");
+  const panels = items.map((item, index) => {
+    const id = `${name}-${item.id}`;
+    const hidden = index === 0 ? "" : " hidden";
+    return `<div role="tabpanel" id="panel-${id}" aria-labelledby="tab-${id}"${hidden}>${item.html}</div>`;
+  }).join("");
+  return `<div class="panel" data-tabs>
+  <div class="panel-bar">
+    <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <div class="tablist" role="tablist" aria-label="${
+    escapeHtml(label)
+  }">${buttons}</div>
+  </div>
+  ${panels}
+</div>`;
+}
+
+/** Home page body. Install snippets use `version` from package.json. */
+export function landing(version: string, base: string): string {
+  const started = siteUrl(base, "docs/getting-started/");
+  const tag = `v${version}`;
+  const install = tabset("install", "Install", [
+    {
+      id: "npm",
+      label: "npm",
+      html: blocks([
+        { lang: "sh", code: `npm install github:kt3k/gawa#${tag}\n` },
+        { lang: "ts", code: `import { createBridge } from "gawa";\n` },
+      ]),
+    },
+    {
+      id: "deno",
+      label: "Deno",
+      html: blocks([{
+        lang: "ts",
+        code:
+          `import { createBridge } from "https://raw.githubusercontent.com/kt3k/gawa/${tag}/web/mod.ts";\n`,
+      }]),
+    },
+    {
+      id: "ios",
+      label: "iOS",
+      html: blocks([{
+        lang: "swift",
+        code:
+          `.package(url: "https://github.com/kt3k/gawa", from: "${version}")\n`,
+      }]),
+    },
+    {
+      id: "android",
+      label: "Android",
+      html: blocks([{
+        lang: "kotlin",
+        code: `// settings.gradle.kts
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://jitpack.io")
+    }
+}
+// build.gradle.kts
+dependencies {
+    implementation("com.github.kt3k:gawa:${tag}")
+}
+`,
+      }]),
+    },
+  ]);
+
+  const example = tabset("example", "Quick example", [
+    {
+      id: "web",
+      label: "Web",
+      html: blocks([{
+        lang: "ts",
+        code: `import { createBridge, GawaError } from "gawa";
+
+// Describe what your app implements.
+type Methods = {
+  "kv.get": (p: { key: string }) => string | null;
+  "kv.set": (p: { key: string; value: string }) => void;
+  "app.version": () => string;
+};
+type Events = { back: null };
+
+const bridge = createBridge<Methods, Events>();
+
+if (bridge.available) {
+  const lang = await bridge.call("kv.get", { key: "lang" }); // string | null
+  bridge.on("back", () => closeDialog());
+} else {
+  // In a normal browser: fall back to web APIs.
+}
+`,
+      }]),
+    },
+    {
+      id: "ios",
+      label: "iOS",
+      html: blocks([{
+        lang: "swift",
+        code: `import Gawa
+import WebKit
+
+let config = WKWebViewConfiguration()
+let root = Bundle.main.url(forResource: "www", withExtension: nil)!
+config.setURLSchemeHandler(GawaSchemeHandler(root: root), forURLScheme: "app")
+let webView = WKWebView(frame: .zero, configuration: config)
+
+let bridge = GawaBridge(allowedOrigins: [URL(string: "app://localhost")!])
+struct KVGet: Decodable { let key: String }
+bridge.router.register("kv.get") { (p: KVGet) -> String? in
+    UserDefaults.standard.string(forKey: p.key)
+}
+bridge.router.register("app.version") { () -> String in "1.0" }
+bridge.attach(to: webView)
+
+webView.load(URLRequest(url: URL(string: "app://localhost/index.html")!))
+
+// Later:
+try bridge.emit("back", nil as String?)
+`,
+      }]),
+    },
+    {
+      id: "android",
+      label: "Android",
+      html: blocks([{
+        lang: "kotlin",
+        code: `import io.github.kt3k.gawa.*
+import kotlinx.serialization.Serializable
+
+@Serializable data class KVGet(val key: String)
+
+val webView = WebView(context)
+webView.webViewClient = GawaWebViewClient(GawaAssets.loader(context))
+
+val bridge = GawaBridge(webView) // before loading the page
+bridge.router.register<KVGet, String?>("kv.get") { prefs.getString(it.key, null) }
+bridge.router.register<Unit, String>("app.version") { "1.0" }
+
+webView.settings.javaScriptEnabled = true
+webView.loadUrl(GawaAssets.url())
+
+// Later:
+bridge.emit("back", null as String?)
+`,
+      }]),
+    },
+  ]);
+
+  return `<div class="wrap home">
+  <section class="hero">
+    <p class="hero-kana" lang="ja">側</p>
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow"><span class="pill">v${
+    escapeHtml(version)
+  }</span> Web · iOS 15+ · Android 24+</p>
+        <h1>gawa</h1>
+        <p class="lede">the shell around something.</p>
+        <p class="hero-copy">A thin, typed bridge between a web page and the native iOS / Android app that hosts it in a WebView. Nothing more: no runtime, no plugin system, no CLI, no opinion about your screens.</p>
+        <div class="actions">
+          <a class="button" href="${started}">Get started</a>
+          <a class="button button-ghost" href="${GITHUB}">View on GitHub</a>
+        </div>
+      </div>
+      <div>
+        <ol class="stack" aria-label="Where gawa sits">
+          <li><span class="stack-k">Page</span><span><code>call</code> / <code>on</code></span></li>
+          <li class="stack-gawa"><span class="stack-k">gawa</span><span>typed RPC and events</span></li>
+          <li><span class="stack-k">WebView</span><span>WKWebView or WebView</span></li>
+        </ol>
+        <p class="side-note">It works in an app you already have — add a WKWebView / WebView anywhere and attach gawa to it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <h2 class="section-title">What it does</h2>
+    <div class="feature-grid">
+      <article>
+        <p class="num">01</p>
+        <h3>Real-origin asset serving</h3>
+        <p>Serve bundled files from a real origin instead of <code>file://</code>.</p>
+        <ul>
+          <li>iOS: <code>WKURLSchemeHandler</code> → <code>app://localhost/</code></li>
+          <li>Android: <code>WebViewAssetLoader</code> → <code>https://appassets.androidplatform.net/</code></li>
+        </ul>
+      </article>
+      <article>
+        <p class="num">02</p>
+        <h3>Typed RPC and events</h3>
+        <p>Request / reply RPC and events, typed on both ends.</p>
+        <ul>
+          <li>iOS: <code>WKScriptMessageHandlerWithReply</code></li>
+          <li>Android: <code>WebViewCompat.addWebMessageListener</code></li>
+        </ul>
+      </article>
+      <article>
+        <p class="num">03</p>
+        <h3>Origin checks</h3>
+        <p>Only your bundled page can talk to the app.</p>
+        <ul>
+          <li>iOS: the message's security origin against an allowlist. Main frame only by default.</li>
+          <li>Android: <code>allowedOriginRules</code> on the message listener. Main frame only.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2 class="section-title">Install</h2>
+    <p class="section-intro">Everything is installed straight from a git tag — no registry needed.</p>
+    ${install}
+    <p class="caption">The npm package name is <code>gawa</code> (the committed <code>web/dist</code>). Swift Package Manager uses the <code>Gawa</code> product, iOS 15+ / macOS 12+. Android is minSdk 24, built by <a href="https://jitpack.io/#kt3k/gawa">JitPack</a> on first request.</p>
+  </section>
+
+  <section id="example">
+    <h2 class="section-title">Quick example</h2>
+    <p class="section-intro">Describe what the app implements. The same method names are registered on the native side.</p>
+    ${example}
+    <p class="caption">Calls reject with <code>GawaError</code> (<code>err.code</code>, <code>err.message</code>). In a normal browser, <code>available</code> is false.</p>
+  </section>
+
+  <section class="close">
+    <p class="pull">Add a WKWebView or WebView anywhere and attach gawa to it.</p>
+    <a class="button" href="${started}">Read the docs</a>
+  </section>
+</div>`;
+}
