@@ -223,7 +223,7 @@ try {
 
   const home = visible(html.get(urlFor("")) ?? "");
   const expectHome = [
-    "the shell around something",
+    "the shell around a WebView",
     "WKURLSchemeHandler",
     "WebViewAssetLoader",
     "app://localhost/",

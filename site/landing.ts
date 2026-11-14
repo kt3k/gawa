@@ -241,7 +241,7 @@ bridge.emit("back")
   return `<div class="wrap home">
   <section class="hero">
     <div class="hero-intro">
-      <p class="hero-brand"><span class="hero-kana" lang="ja" aria-hidden="true">側</span><span class="hero-name">gawa</span><span class="lede">the shell around something.</span><span class="pill">v${
+      <p class="hero-brand"><span class="hero-kana" lang="ja" aria-hidden="true">側</span><span class="hero-name">gawa</span><span class="lede">the shell around a WebView.</span><span class="pill">v${
     escapeHtml(version)
   }</span></p>
       <h1>A thin, typed bridge between a web page and the app that hosts it.</h1>
@@ -259,7 +259,7 @@ bridge.emit("back")
       </div>
       ${heroApp}
     </div>
-    <p class="hero-note">The same method name on both ends, typed on both ends. Only your bundled page can call it. Attach it to a WKWebView / WebView in an app you already have.</p>
+    <p class="hero-note">One method name, typed on both ends. It attaches to the WKWebView or WebView already in your app.</p>
   </section>
 
   <section id="features">
@@ -268,7 +268,7 @@ bridge.emit("back")
       <article>
         <p class="num">01</p>
         <h3><a href="${originDoc}">Real-origin asset serving</a></h3>
-        <p>Serve bundled files from a real origin instead of <code>file://</code>.</p>
+        <p>Serve bundled files from a real origin instead of <code>file://</code>, so the page gets the same-origin rules it has on the web.</p>
         <ul class="spec">
           <li><span class="spec-k">iOS</span><span class="spec-v"><code>WKURLSchemeHandler</code><span aria-hidden="true">→</span><code>app://localhost/</code></span></li>
           <li><span class="spec-k">Android</span><span class="spec-v"><code>WebViewAssetLoader</code><span aria-hidden="true">→</span><code>https://appassets.androidplatform.net/</code></span></li>
@@ -277,7 +277,7 @@ bridge.emit("back")
       <article>
         <p class="num">02</p>
         <h3><a href="${callDoc}">Typed RPC and events</a></h3>
-        <p>Request / reply RPC and events, typed on both ends.</p>
+        <p>A call returns a Promise with a typed result or a <code>GawaError</code>. The app can also push events to the page.</p>
         <ul class="spec">
           <li><span class="spec-k">iOS</span><span class="spec-v"><code>WKScriptMessageHandlerWithReply</code></span></li>
           <li><span class="spec-k">Android</span><span class="spec-v"><code>WebViewCompat.addWebMessageListener</code></span></li>

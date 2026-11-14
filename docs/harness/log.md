@@ -5,6 +5,16 @@ Short notes from maintenance passes. User-visible changes also go in
 
 ## 2026-11-14
 
+Landing copy pass against general copywriting advice (clear beats clever,
+concrete beats abstract, benefits over mechanism). The tagline "the shell
+around something" said nothing about what gawa wraps, so it is now "the
+shell around a WebView", which the page title and og:image alt already used.
+README matches. The hero note no longer repeats "on both ends" or the origin
+check that feature 03 states. Feature 01 says why a real origin matters, and
+feature 02 says what a call returns. `cd site && deno task check` passed.
+
+## 2026-11-14
+
 Landing hero, second pass: the large 側 took about 170px of the first screen
 and pushed the code pair below the fold. Library landing pages lead with a
 headline that says what the tool does and put code above the fold, so 側 is

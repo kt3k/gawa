@@ -1,6 +1,6 @@
 # gawa
 
-> **gawa** (側) — the shell around something.
+> **gawa** (側, "side") — the shell around a WebView.
 
 Documentation: <https://kt3k.github.io/gawa/>
 Specification: <https://github.com/kt3k/gawa/blob/main/SPEC.md>
