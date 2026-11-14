@@ -240,14 +240,12 @@ bridge.emit("back")
 
   return `<div class="wrap home">
   <section class="hero">
-    <p class="hero-kana" lang="ja">側</p>
     <div class="hero-intro">
-      <p class="eyebrow"><span class="pill">v${
+      <p class="hero-brand"><span class="hero-kana" lang="ja" aria-hidden="true">側</span><span class="hero-name">gawa</span><span class="lede">the shell around something.</span><span class="pill">v${
     escapeHtml(version)
-  }</span> Web · iOS 15+ · Android 24+</p>
-      <h1>gawa</h1>
-      <p class="lede">the shell around something.</p>
-      <p class="hero-copy">A thin, typed bridge between a web page and the native iOS / Android app that hosts it in a WebView. Nothing more: no runtime, no plugin system, no CLI, no opinion about your screens.</p>
+  }</span></p>
+      <h1>A thin, typed bridge between a web page and the app that hosts it.</h1>
+      <p class="hero-copy">For WKWebView on iOS 15+ and WebView on Android 24+. Nothing more: no runtime, no plugin system, no CLI, no opinion about your screens.</p>
       <div class="actions">
         <a class="button" href="${started}">Get started</a>
         <a class="button button-ghost" href="${GITHUB}">View on GitHub</a>

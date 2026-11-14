@@ -5,6 +5,16 @@ Short notes from maintenance passes. User-visible changes also go in
 
 ## 2026-11-14
 
+Landing hero, second pass: the large 側 took about 170px of the first screen
+and pushed the code pair below the fold. Library landing pages lead with a
+headline that says what the tool does and put code above the fold, so 側 is
+now a small seal beside the "gawa" wordmark, the h1 states what gawa is, and
+the call / register pair fits in a 1280×800 first screen. `.hero-kana`
+stays as the seal class. `cd site && deno task check` passed. Checked
+desktop, phone, and dark mode in screenshots.
+
+## 2026-11-14
+
 Landing hero: replaced the three-row "Page / gawa / WebView" stack with the
 page call and the app handler side by side (TypeScript next to Swift /
 Kotlin tabs, `call` and `emit` arrows between them). The survey of developer
