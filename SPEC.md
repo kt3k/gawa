@@ -550,7 +550,8 @@ behavior MUST do the same:
   event. Hello produces neither a reply nor a recorded call.
 - `gawa.methods` is answered with the handler names, in insertion order, and
   is not itself one of those names. A handler registered under that name is
-  not called.
+  not called. `legacyMethods`, default false, answers that query with
+  `unknown_method` instead, so `has` resolves `null`.
 - `emit(event, data)` delivers an event envelope. `data` omitted means `null`.
   On iOS this calls `__gawa.receive` after the bridge has installed it. The
   mock MUST NOT install `__gawa` itself.
@@ -620,6 +621,17 @@ example list in `schema/example.json` and generates TypeScript, Swift, and
 Kotlin from it. A reimplementation MAY use any other way to keep the page's
 method map and the native handlers in agreement. Generated types are not part
 of the wire protocol.
+
+The generator accepts the primitives `string`, `int`, `bool`, `void`, and
+`null`, arrays (`T[]`), and nullability (`T | null`). Named structs live in
+`types`, or inline as a params or result object with `name` and `fields`. A
+name used by more than one method is emitted once. A struct used as a result
+is `Encodable` in Swift (and `Codable` when it is also a parameter). Event
+`data: null` is a payload-less event (`null` on the page). An empty event
+list generates `Record<never, never>`, not `{}`. With no arguments the
+generator reads `schema/example.json` and writes the example apps. `--schema`,
+`--ts`, `--swift`, `--kotlin`, and `--kotlin-package` override those paths
+and the Kotlin package (`io.github.kt3k.gawa.example` by default).
 
 ## 12. Conformance Tests
 

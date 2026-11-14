@@ -94,6 +94,17 @@ Types that cross the bridge must be `@Serializable`. See [Android](/docs/android
 
 The example page and the two apps share [`schema/example.json`](https://github.com/kt3k/gawa/blob/main/schema/example.json). `deno run -A schema/generate.ts` writes the TypeScript, Swift, and Kotlin types. CI fails if those files drift from the schema.
 
+Types are `string`, `int`, `bool`, `void`, `null`, `T[]`, and `T | null`. Named structs go in `types` (or inline on a method) and are emitted once, including when a method returns one. An event with `"data": null` has no payload. Another schema uses the same generator:
+
+```sh
+deno run -A schema/generate.ts \
+  --schema schema/host.json \
+  --ts src/ui/host.gen.ts \
+  --swift HostTypes.swift \
+  --kotlin HostTypes.kt \
+  --kotlin-package io.github.kt3k.shatranj
+```
+
 ## Wire it up
 
 1. Bundle the web build and serve it from a real origin: [`GawaSchemeHandler`](/docs/ios/) on iOS (`app://localhost/` in the examples), [`GawaAssets`](/docs/android/) on Android (`https://appassets.androidplatform.net/`).

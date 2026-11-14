@@ -94,6 +94,10 @@ bridge end to end; CI runs it in a real `WKWebView` (macOS) and a real Android
 The page, the iOS app, and the Android app share one method list,
 [`schema/example.json`](schema/example.json). Regenerate the types with
 `deno run -A schema/generate.ts`. CI fails if the generated files drift.
+`--schema`, `--ts`, `--swift`, `--kotlin`, and `--kotlin-package` point the
+same generator at another schema. Types include `T | null`, `T[]`, named
+structs (emitted once, including result types), and payload-less events
+(`"data": null`).
 
 Build the page first (requires [Deno](https://deno.com)):
 

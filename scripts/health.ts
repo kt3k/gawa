@@ -76,6 +76,16 @@ await run("web test", [deno, "test"], `${root}/web`);
 await run("web/dist drift", ["bash", "web/build.sh"]);
 await run("web/dist diff", ["git", "diff", "--exit-code", "--", "web/dist"]);
 await run("versions", [deno, "run", "-A", "scripts/check-versions.ts"]);
+await run("schema fmt", [deno, "fmt", "--check", "schema"]);
+await run("schema lint", [deno, "lint", "schema"]);
+await run("schema test", [
+  deno,
+  "test",
+  "-A",
+  "--config",
+  "schema/deno.json",
+  "schema",
+]);
 await run("schema generate", [deno, "run", "-A", "schema/generate.ts"]);
 await run("schema diff", [
   "git",

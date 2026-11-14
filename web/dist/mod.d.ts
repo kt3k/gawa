@@ -119,6 +119,11 @@ export interface MockOptions {
      * a `GawaError` becomes `internal`. Unknown methods reply `unknown_method`.
      */
     handlers?: Record<string, (params: unknown) => unknown | Promise<unknown>>;
+    /**
+     * When true, `gawa.methods` is answered with `unknown_method`, as an older
+     * shell does. `bridge.has` then resolves `null`. Default false.
+     */
+    legacyMethods?: boolean;
 }
 export interface MockNative {
     /** Calls received since installation, in order. */

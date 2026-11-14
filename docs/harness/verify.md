@@ -22,6 +22,7 @@ From the repository root, this is what the `web` CI job runs:
 cd web && deno fmt --check && deno lint && deno check mod.ts && deno test
 cd .. && web/build.sh && git diff --exit-code -- web/dist
 deno run -A scripts/check-versions.ts
+deno fmt --check schema && deno lint schema && deno test -A --config schema/deno.json schema
 deno run -A schema/generate.ts && git diff --exit-code -- \
   examples/web/src/methods.ts \
   examples/ios/Sources/ExampleTypes.swift \

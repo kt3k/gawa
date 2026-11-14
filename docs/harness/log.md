@@ -5,6 +5,15 @@ Short notes from maintenance passes. User-visible changes also go in
 
 ## 2026-11-14
 
+Schema generator: nullable types, arrays, named structs emitted once
+(including result types), and payload-less events. Empty event lists no
+longer generate `{}`. CLI flags `--schema`, `--ts`, `--swift`, `--kotlin`,
+and `--kotlin-package` keep the example defaults. `installMock` gained
+`legacyMethods` so tests can see `has` resolve null. `deno test schema` is
+part of health.ts.
+
+## 2026-11-14
+
 Payload-less `emit(event)` on iOS and Android, a generic `call` type so a
 wrapper needs no cast, and `bridge.has` backed by the reserved router method
 `gawa.methods`. `unknown_method` stays the missing-method code. Older shells

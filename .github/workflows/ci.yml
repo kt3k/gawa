@@ -25,6 +25,10 @@ jobs:
         run: web/build.sh && git diff --exit-code -- web/dist
       - name: package.json and Android version match
         run: deno run -A scripts/check-versions.ts
+      - name: schema generator
+        run: >-
+          deno fmt --check schema && deno lint schema &&
+          deno test -A --config schema/deno.json schema
       - name: generated bridge types match schema/example.json
         run: >-
           deno run -A schema/generate.ts &&

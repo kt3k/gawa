@@ -50,6 +50,19 @@ Deno.test("installMock: answers calls and emits events", async () => {
   mock.uninstall();
 });
 
+Deno.test("installMock: legacyMethods makes has resolve null", async () => {
+  const g = {};
+  const mock = installMock({
+    global: g,
+    legacyMethods: true,
+    handlers: { "app.version": () => "1.0" },
+  });
+  const bridge = createBridge<Methods>({ global: g });
+  assertEquals(await bridge.has("app.version"), null);
+  assertEquals(await bridge.call("app.version"), "1.0");
+  mock.uninstall();
+});
+
 Deno.test("installMock: android host says hello and replies", async () => {
   const g = {};
   installMock({

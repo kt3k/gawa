@@ -147,7 +147,7 @@ mock.emit("back", null); // bridge.on("back", …)
 mock.uninstall();
 ```
 
-`handlers` return the result, or throw `GawaError` for an app-defined code. Anything else becomes `internal`. A method with no handler replies `unknown_method`. `platform` defaults to `"ios"`; pass `"android"` to imitate that transport, including the hello message. `calls` lists what the page sent. `emit` delivers an event after the bridge exists.
+`handlers` return the result, or throw `GawaError` for an app-defined code. Anything else becomes `internal`. A method with no handler replies `unknown_method`. `platform` defaults to `"ios"`; pass `"android"` to imitate that transport, including the hello message. `calls` lists what the page sent. `emit` delivers an event after the bridge exists. `legacyMethods: true` answers `gawa.methods` with `unknown_method`, so `has` resolves `null` the way an older shell does.
 
 ```ts
 const bridge = createBridge<Methods, Events>({ timeout: 10_000 });

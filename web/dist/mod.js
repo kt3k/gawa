@@ -232,6 +232,16 @@ export function installMock(options = {}) {
         calls.push({ method: req.method, params: req.params });
         const id = req.id;
         if (req.method === "gawa.methods") {
+            if (options.legacyMethods) {
+                return JSON.stringify({
+                    gawa: PROTOCOL,
+                    id,
+                    error: {
+                        code: "unknown_method",
+                        message: "unknown method: gawa.methods",
+                    },
+                });
+            }
             return JSON.stringify({
                 gawa: PROTOCOL,
                 id,
