@@ -57,21 +57,56 @@ export class GawaError extends Error {
   }
 }
 
+/** Methods whose parameter list is not a required tuple (`()` or an untyped function). */
+type NoParamKeys<M extends MethodMap> = {
+  [K in keyof M & string]: Parameters<M[K]> extends
+    readonly [unknown, ...unknown[]] ? never : K;
+}[keyof M & string];
+
+/** Methods that take one required parameter. */
+type ParamKeys<M extends MethodMap> = {
+  [K in keyof M & string]: Parameters<M[K]> extends
+    readonly [unknown, ...unknown[]] ? K : never;
+}[keyof M & string];
+
 export interface Bridge<M extends MethodMap, E extends EventMap> {
   /** True when a native host is attached. */
   readonly available: boolean;
   /** Which native host is attached, if any. */
   readonly platform: Platform | null;
-  /** Calls a native method. Rejects with {@link GawaError}. */
+  /**
+   * Calls a native method. Rejects with {@link GawaError}.
+   *
+   * A method with a parameter takes that value. A method with no parameter
+   * is called with no second argument. A generic key also works:
+   * `call<K extends keyof M>(method: K, params: Parameters<M[K]>[0])`.
+   */
+  call<K extends ParamKeys<M> & string>(
+    method: K,
+    params: Parameters<M[K]>[0],
+  ): Promise<Awaited<ReturnType<M[K]>>>;
+  call<K extends NoParamKeys<M> & string>(
+    method: K,
+  ): Promise<Awaited<ReturnType<M[K]>>>;
   call<K extends keyof M & string>(
     method: K,
-    ...params: Parameters<M[K]>
+    params: Parameters<M[K]>[0],
   ): Promise<Awaited<ReturnType<M[K]>>>;
-  /** Listens to a native event; returns a function that stops listening. */
+  /**
+   * Listens to a native event; returns a function that stops listening.
+   * When `E[K]` is `null` or `void`, the listener may take no argument.
+   */
   on<K extends keyof E & string>(
     event: K,
     listener: (data: E[K]) => void,
   ): () => void;
+  /**
+   * Whether the host registered `method`. Resolves `false` when no host is
+   * attached, `true` or `false` from `gawa.methods` when the host lists its
+   * methods, and `null` when it does not (an older shell) or the query fails.
+   * It does not reject.
+   */
+  has(method: string): Promise<boolean | null>;
 }
 
 export interface BridgeOptions {
@@ -273,9 +308,22 @@ export function createBridge<
   return {
     available: c.transport !== null,
     platform: c.transport?.platform ?? null,
-    call: (method, ...params) =>
+    call: (method: string, ...params: unknown[]) =>
       c.call(method, params[0], timeout) as Promise<never>,
     on: (event, listener) => c.on(event, listener as (d: unknown) => void),
+    has(method) {
+      if (!c.transport) return Promise.resolve(false);
+      return c.call("gawa.methods", undefined, timeout).then(
+        (result) => {
+          if (
+            !Array.isArray(result) ||
+            result.some((name) => typeof name !== "string")
+          ) return null;
+          return result.includes(method);
+        },
+        () => null,
+      );
+    },
   };
 }
 
@@ -342,6 +390,13 @@ export function installMock(options: MockOptions = {}): MockNative {
     if (req.hello) return;
     calls.push({ method: req.method, params: req.params });
     const id = req.id;
+    if (req.method === "gawa.methods") {
+      return JSON.stringify({
+        gawa: PROTOCOL,
+        id,
+        result: Object.keys(handlers).filter((name) => name !== "gawa.methods"),
+      });
+    }
     try {
       const handler = handlers[req.method];
       if (!handler) {

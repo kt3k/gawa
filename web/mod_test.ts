@@ -150,6 +150,37 @@ Deno.test("no host: unavailable, calls reject", async () => {
   assertEquals(e.code, "unavailable");
 });
 
+Deno.test("has: lists methods, and older shells resolve null", async () => {
+  const listed = fakeIOS();
+  const previous = listed.g.webkit as {
+    messageHandlers: {
+      gawa: { postMessage: (body: string) => Promise<string> };
+    };
+  };
+  const post = previous.messageHandlers.gawa.postMessage;
+  previous.messageHandlers.gawa.postMessage = (body: string) => {
+    const req = JSON.parse(body);
+    if (req.method === "gawa.methods") {
+      return Promise.resolve(JSON.stringify({
+        gawa: PROTOCOL,
+        id: req.id,
+        result: ["hello", "add"],
+      }));
+    }
+    return post(body);
+  };
+  const listedBridge = createBridge<Methods>({ global: listed.g });
+  assertEquals(await listedBridge.has("hello"), true);
+  assertEquals(await listedBridge.has("missing"), false);
+
+  const older = fakeIOS();
+  const olderBridge = createBridge<Methods>({ global: older.g });
+  assertEquals(await olderBridge.has("hello"), null);
+
+  const none = createBridge<Methods>({ global: {} });
+  assertEquals(await none.has("hello"), false);
+});
+
 Deno.test("ignores foreign and malformed messages", async () => {
   const { g } = fakeIOS();
   const b = createBridge<Methods, Events>({ global: g });

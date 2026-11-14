@@ -3,6 +3,14 @@
 Short notes from maintenance passes. User-visible changes also go in
 `CHANGELOG.md` under `## Unreleased`. Newest first.
 
+## 2026-11-14
+
+Payload-less `emit(event)` on iOS and Android, a generic `call` type so a
+wrapper needs no cast, and `bridge.has` backed by the reserved router method
+`gawa.methods`. `unknown_method` stays the missing-method code. Older shells
+make `has` resolve `null`. `protocol/cases.json` checks the method list.
+`deno run -A scripts/health.ts` passed. iOS and Android were left to CI.
+
 ## 2026-11-13
 
 Added this harness, `AGENTS.md`, `CONTRIBUTING.md`, issue and pull request

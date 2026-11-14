@@ -141,7 +141,7 @@ Codes defined by gawa:
 
 | code | who emits it | meaning |
 | --- | --- | --- |
-| `unknown_method` | router | no handler is registered for `method`. `message` MUST be `unknown method: ` followed by the method name. |
+| `unknown_method` | router | no handler is registered for `method`. `message` MUST be `unknown method: ` followed by the method name. This code is stable: a page detects a missing method by this code, including on a host that does not implement [section 6.5](#65-capability-query). |
 | `invalid_params` | router | `params` could not be decoded into the handler's parameter type. The message is implementation-defined. |
 | `internal` | router or page | the handler threw something that is not a gawa error, or the page transport failed. The message is implementation-defined unless stated otherwise. |
 | `unavailable` | page | no native host is attached. The reference message is `no native host is attached`. |
@@ -233,6 +233,32 @@ message, or the thrown value's string form when there is no message.
 that share a connection MAY use different timeouts. `log` is shared: the
 latest function passed to `createBridge` on that global is the one used.
 
+The reference TypeScript `call` MUST be usable in both of these forms:
+
+- `call(method)` when that method takes no parameters, and `call(method, params)`
+  when it takes one.
+- `call(method, params)` where `method` is a generic key `K extends keyof Methods`
+  and `params` is that method's parameter type (which is `undefined` when `K`
+  is a method that takes none). A wrapper with that shape MUST NOT need a cast.
+
+### 5.3.1 has
+
+`has(method)` asks whether the host registered `method`. It MUST resolve. It
+MUST NOT reject.
+
+- No host is attached: resolve `false`.
+- The host answers `gawa.methods` ([section 6.5](#65-capability-query)) with
+  an array of strings: resolve `true` when `method` is one of them, otherwise
+  `false`.
+- The host replies `unknown_method` for `gawa.methods`, the reply is not an
+  array of strings, or the query fails (timeout, `internal`, anything else):
+  resolve `null`. `null` means the page cannot tell. A page that must support
+  an older shell then calls the method and treats `unknown_method` as "not
+  registered".
+
+`gawa.methods` is not part of the application's method map. The reference
+sends it as a normal request with no `params`.
+
 ### 5.4 on
 
 `on(event, listener)` registers `listener` and returns a function that removes
@@ -240,6 +266,11 @@ it. When an event envelope arrives, every current listener for that name is
 called with the data from [section 4.4](#44-event-native-to-page). A listener
 that throws MUST NOT prevent the others from running. The reference rethrows
 that error on a later turn.
+
+When the event's data type is `null` or `void`, the reference TypeScript
+types MUST accept a listener that takes no argument, such as
+`on("files.opened", () => {})`. A listener that takes the `null` value MUST
+keep working.
 
 ### 5.5 Receiving
 
@@ -318,6 +349,27 @@ omitting `data`.
 A router MAY expose a log function of one string. The reference logs
 `receive ` plus the raw body, `ignore ` plus the body when it is not a
 request, and `reply ` plus the reply JSON. The default MUST be off.
+
+### 6.5 Capability query
+
+The method name `gawa.methods` is reserved. A conforming router MUST answer
+it with a result that is a JSON array of strings: the names currently
+registered, in the order they were first registered. Re-registering a name
+replaces the handler and MUST NOT add a second entry or move the name.
+`unregister` removes the name. The array MUST NOT contain `gawa.methods`.
+
+`register` of `gawa.methods` MUST be ignored. `unregister` of it MUST be a
+no-op. Parameters on the query MUST be ignored. The reply is still a normal
+success reply ([section 4.3](#43-reply-native-to-page)).
+
+A router that does not implement this query is an older shell. It answers
+`unknown_method`. The page treats that as [section 5.3.1](#531-has).
+
+### 6.6 Payload-less emit
+
+`emit(event)` with no data argument MUST send an event whose `data` is JSON
+`null`. `emit(event, data)`, including `nil` / `null` encoded as JSON `null`,
+MUST keep working.
 
 ## 7. Transports
 
@@ -496,6 +548,9 @@ behavior MUST do the same:
 - On iOS, `postMessage` returns a promise of the reply JSON string (or no
   reply for hello). On Android, a reply is delivered later as a `message`
   event. Hello produces neither a reply nor a recorded call.
+- `gawa.methods` is answered with the handler names, in insertion order, and
+  is not itself one of those names. A handler registered under that name is
+  not called.
 - `emit(event, data)` delivers an event envelope. `data` omitted means `null`.
   On iOS this calls `__gawa.receive` after the bridge has installed it. The
   mock MUST NOT install `__gawa` itself.
@@ -543,7 +598,9 @@ else if id is a number and a call with that id is pending:
 parse object
 if gawa is not 1 or id is not an integer number or method is not a string:
   return no reply
-if no handler:
+if method is gawa.methods:
+  reply result: registered names, in registration order
+else if no handler:
   reply error unknown_method
 else:
   decode params (omitted and null both mean no parameters)
@@ -646,11 +703,18 @@ Page:
 - [ ] Events deliver `null` for JSON `null` or missing `data`.
 - [ ] Ignore the wrong version and malformed JSON.
 - [ ] Pass [section 12.3](#123-page).
+- [ ] `has(method)` resolves `false`, `true`, or `null` as in
+      [section 5.3.1](#531-has), and does not reject.
+- [ ] A generic `call` wrapper type-checks without a cast, and a `null` or
+      `void` event accepts a listener with no argument
+      ([section 5.3](#53-call), [section 5.4](#54-on)).
 
 Router:
 
 - [ ] One reply or no reply, with the keys in [section 4.3](#43-reply-native-to-page).
 - [ ] `unknown_method` message matches [section 4.3](#43-reply-native-to-page).
+- [ ] `gawa.methods` returns the registered names in registration order
+      ([section 6.5](#65-capability-query)).
 - [ ] Application error code and message pass through.
 - [ ] Decode failure is `invalid_params`. Any other throw is `internal`.
 - [ ] Omitted and null params both mean no parameters.
@@ -662,6 +726,7 @@ iOS profile, in addition:
 - [ ] `gawa` reply handler in the page content world, installed before load.
 - [ ] Origin and main-frame checks in [section 7.1](#71-ios-wkwebview).
 - [ ] Events through `__gawa.receive`.
+- [ ] `emit(event)` sends `data: null` ([section 6.6](#66-payload-less-emit)).
 - [ ] `detach` removes the handler.
 - [ ] Custom-scheme serving in [section 8.1](#81-ios-custom-scheme), including
       the root escape check.
@@ -671,6 +736,7 @@ Android profile, in addition:
 - [ ] `addWebMessageListener` named `gawa` before load, main frame only.
 - [ ] Hello stores the event proxy. Emit before hello does not send.
 - [ ] Replies use the request's reply proxy.
+- [ ] `emit(event)` sends `data: null` ([section 6.6](#66-payload-less-emit)).
 - [ ] Asset serving in [section 8.2](#82-android-asset-loader), including `.`
       and `..` segments.
 - [ ] Fail construction when `WEB_MESSAGE_LISTENER` is missing.

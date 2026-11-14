@@ -176,7 +176,7 @@ bridge.attach(to: webView)
 webView.load(URLRequest(url: URL(string: "app://localhost/index.html")!))
 
 // Later:
-try bridge.emit("back", nil as String?)
+try bridge.emit("back")
 ```
 
 `attach(to:)` makes the web view's content controller retain the bridge; call
@@ -203,7 +203,7 @@ webView.settings.javaScriptEnabled = true
 webView.loadUrl(GawaAssets.url())
 
 // Later:
-bridge.emit("back", null as String?)
+bridge.emit("back")
 ```
 
 Use `Unit` for no parameters / no result. Types crossing the bridge must be

@@ -3,6 +3,7 @@ package io.github.kt3k.gawa
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -29,6 +30,9 @@ public class GawaRouter(
 ) {
     public companion object {
         public const val PROTOCOL: Int = 1
+
+        /** Reserved method that lists registered names. Not itself a registration. */
+        public const val METHODS: String = "gawa.methods"
     }
 
     /** Optional line logger for each request and reply. Null by default. */
@@ -38,8 +42,14 @@ public class GawaRouter(
     internal val handlers: MutableMap<String, suspend (JsonElement) -> JsonElement> =
         mutableMapOf()
 
-    /** Registers a handler working on raw JSON (`JsonNull` when absent). */
+    /** Registration order. Re-registering a name does not move it. */
+    private val order = mutableListOf<String>()
+
+    /** Registers a handler working on raw JSON (`JsonNull` when absent).
+     *  Registering [METHODS] does nothing; the router answers that name. */
     public fun registerRaw(method: String, handler: suspend (JsonElement) -> JsonElement) {
+        if (method == METHODS) return
+        if (method !in handlers) order.add(method)
         handlers[method] = handler
     }
 
@@ -73,6 +83,7 @@ public class GawaRouter(
 
     public fun unregister(method: String) {
         handlers.remove(method)
+        order.remove(method)
     }
 
     /** A parsed incoming message. */
@@ -102,6 +113,16 @@ public class GawaRouter(
         val env = request.body
         val id = (env["id"] as JsonPrimitive).int
         val method = (env["method"] as JsonPrimitive).content
+        if (method == METHODS) {
+            val listed = buildJsonObject {
+                put("gawa", PROTOCOL)
+                put("id", id)
+                put("result", JsonArray(order.map { JsonPrimitive(it) }))
+            }
+            val text = listed.toString()
+            log?.invoke("reply $text")
+            return text
+        }
         val reply = try {
             val handler = handlers[method]
                 ?: throw GawaError("unknown_method", "unknown method: $method")

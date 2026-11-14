@@ -7,6 +7,12 @@ allow those releases to break. See `docs/harness/principles.md`.
 
 ## Unreleased
 
+### Added
+
+- `emit(event)` on iOS and Android sends an event with JSON `null` data. `emit(event, data)`, including `nil as String?` and `null as String?`, is unchanged.
+- `bridge.has(method)` reports whether the host registered that method. A current router answers the reserved call `gawa.methods` with the registered names. An older shell, which replies `unknown_method`, makes `has` resolve `null` instead of rejecting. `unknown_method` (message `unknown method: <name>`) stays the stable code for a missing method.
+- The web `call` type accepts a generic method key, so a helper `callHost<K extends keyof Methods>(method, params)` does not need a cast. Methods with no parameter are still called with no second argument. A `null` or `void` event listener may omit its argument.
+
 ## 0.1.0
 
 - Web SDK, iOS bridge, and Android bridge. Protocol version 1.

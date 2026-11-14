@@ -70,6 +70,7 @@ public final class GawaBridge: NSObject, WKScriptMessageHandlerWithReply {
     )
     public func attach(to webView: WKWebView)
     public func detach()
+    public func emit(_ event: String) throws
     public func emit<D: Encodable>(_ event: String, _ data: D) throws
 }
 ```
@@ -89,10 +90,10 @@ A message is handled when it is from the main frame (or `allowSubframes` is true
 
 Anything else is not dispatched. The script-message reply handler is called with the error string `"gawa: message rejected"`, so the page's `postMessage` promise rejects and `call` rejects with `GawaError` code `internal`. A string that is not a gawa request gets `"gawa: not a request"`.
 
-`emit` sends an event the page receives with `bridge.on`. It does nothing unless the web view is showing a page whose URL matches an allowed origin (`scheme`, `host`, and `port`, with a missing port matching only a missing port). The payload is any `Encodable`. Pass `nil as String?` for no data.
+`emit` sends an event the page receives with `bridge.on`. It does nothing unless the web view is showing a page whose URL matches an allowed origin (`scheme`, `host`, and `port`, with a missing port matching only a missing port). The payload is any `Encodable`. `emit("back")` sends JSON `null`. `emit("back", nil as String?)` still does the same.
 
 ```swift
-try bridge.emit("back", nil as String?)
+try bridge.emit("back")
 ```
 
 ## GawaRouter

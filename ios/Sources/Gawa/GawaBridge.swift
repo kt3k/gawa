@@ -7,7 +7,7 @@ import WebKit
 /// let bridge = GawaBridge(allowedOrigins: [URL(string: "app://localhost")!])
 /// bridge.router.register("app.version") { () -> String in "1.0" }
 /// bridge.attach(to: webView)   // before loading the page
-/// try bridge.emit("back", nil as String?)
+/// try bridge.emit("back")
 /// ```
 ///
 /// The page calls `webkit.messageHandlers.gawa.postMessage(json)`, which
@@ -55,8 +55,14 @@ public final class GawaBridge: NSObject, WKScriptMessageHandlerWithReply {
         webView = nil
     }
 
+    /// Sends an event with no payload (`data` is JSON `null`).
+    public func emit(_ event: String) throws {
+        try emit(event, nil as String?)
+    }
+
     /// Sends an event to the page (`bridge.on(event, …)` on the web side).
     /// Does nothing unless the web view shows a page from an allowed origin.
+    /// Pass `nil as String?` for no data; `emit(event)` does the same.
     public func emit<D: Encodable>(_ event: String, _ data: D) throws {
         guard let webView, let url = webView.url, isAllowed(url) else {
             log?("emit \(event) skipped")

@@ -24,12 +24,20 @@ public final class GawaRouter {
     /// A handler taking and returning JSON (`nil` means JSON `null`).
     public typealias RawHandler = (_ params: Data?) async throws -> Data?
 
+    /// Reserved method that lists registered names. Not itself a registration.
+    public static let methodsMethod = "gawa.methods"
+
     private var handlers: [String: RawHandler] = [:]
+    /// Registration order. Re-registering a name does not move it.
+    private var order: [String] = []
 
     public init() {}
 
     /// Registers a handler working on raw JSON.
+    /// Registering `gawa.methods` does nothing; the router answers that name.
     public func registerRaw(_ method: String, _ handler: @escaping RawHandler) {
+        guard method != Self.methodsMethod else { return }
+        if handlers[method] == nil { order.append(method) }
         handlers[method] = handler
     }
 
@@ -69,6 +77,7 @@ public final class GawaRouter {
 
     public func unregister(_ method: String) {
         handlers[method] = nil
+        order.removeAll { $0 == method }
     }
 
     /// Handles one request envelope (a JSON string) and returns the reply
@@ -87,6 +96,12 @@ public final class GawaRouter {
         }
 
         var reply: [String: Any] = ["gawa": Self.protocolVersion, "id": id]
+        if method == Self.methodsMethod {
+            reply["result"] = order
+            let out = Self.string(reply)
+            log?("reply \(out)")
+            return out
+        }
         do {
             guard let handler = handlers[method] else {
                 throw GawaError("unknown_method", "unknown method: \(method)")

@@ -304,6 +304,7 @@ try {
       'id="42-hello-android-transport-only"',
       'id="12-conformance-tests"',
       "protocol/cases.json",
+      "gawa.methods",
     ]
   ) {
     if (!spec.includes(needle)) {
@@ -318,6 +319,8 @@ try {
       "no native host is attached",
       "On this page",
       "data-copy",
+      "gawa.methods",
+      "does not reject",
     ],
     "docs/ios/": [
       'id="gawabridge"',

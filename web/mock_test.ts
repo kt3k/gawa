@@ -45,6 +45,8 @@ Deno.test("installMock: answers calls and emits events", async () => {
     "missing",
     "app.fail",
   ]);
+  assertEquals(await bridge.has("app.version"), true);
+  assertEquals(await bridge.has("missing"), false);
   mock.uninstall();
 });
 

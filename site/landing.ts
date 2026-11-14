@@ -156,7 +156,7 @@ bridge.attach(to: webView)
 webView.load(URLRequest(url: URL(string: "app://localhost/index.html")!))
 
 // Later:
-try bridge.emit("back", nil as String?)
+try bridge.emit("back")
 `,
       }]),
     },
@@ -182,7 +182,7 @@ webView.settings.javaScriptEnabled = true
 webView.loadUrl(GawaAssets.url())
 
 // Later:
-bridge.emit("back", null as String?)
+bridge.emit("back")
 `,
       }]),
     },

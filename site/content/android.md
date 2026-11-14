@@ -101,6 +101,7 @@ public class GawaBridge @MainThread constructor(
         public fun isSupported(): Boolean
     }
 
+    public fun emit(event: String)
     public inline fun <reified D> emit(event: String, data: D)
     @MainThread public fun emitRaw(event: String, data: JsonElement): Boolean
     @MainThread public fun dispose()
@@ -119,10 +120,10 @@ Handlers run on `scope` (a `MainScope` by default). The reply is posted on the m
 
 The page sends `{ "gawa": 1, "hello": true }` once, when it creates its first bridge. The app keeps that message's `JavaScriptReplyProxy` and sends events through it. Replies use the proxy of the request they answer.
 
-`emit` encodes `data` with the router's JSON and posts an event envelope. `emitRaw` posts a `JsonElement` and returns false when the page has not said hello yet, in which case the event is not sent. `emit` ignores that boolean.
+`emit` encodes `data` with the router's JSON and posts an event envelope. `emitRaw` posts a `JsonElement` and returns false when the page has not said hello yet, in which case the event is not sent. `emit` ignores that boolean. `emit("back")` sends JSON `null`. `emit("back", null as String?)` still does the same.
 
 ```kotlin
-bridge.emit("back", null as String?)
+bridge.emit("back")
 ```
 
 ## GawaRouter

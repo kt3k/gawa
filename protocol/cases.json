@@ -79,6 +79,15 @@
       "name": "message without gawa is ignored",
       "request": { "id": 1, "method": "app.version" },
       "reply": null
+    },
+    {
+      "name": "gawa.methods lists registered handlers",
+      "request": { "gawa": 1, "id": 11, "method": "gawa.methods" },
+      "reply": {
+        "gawa": 1,
+        "id": 11,
+        "result": ["kv.get", "kv.set", "app.version", "app.fail", "app.boom"]
+      }
     }
   ],
   "events": [

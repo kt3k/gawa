@@ -51,7 +51,16 @@ call<K extends keyof M & string>(
 ): Promise<Awaited<ReturnType<M[K]>>>;
 ```
 
-`call` sends the first argument as the envelope's `params`. A method with no parameters is called with no second argument, and the envelope omits `params`.
+`call` sends the first argument as the envelope's `params`. A method with no parameters is called with no second argument, and the envelope omits `params`. A generic key works without a cast, including when that key might be a method with no parameters (`params` is then `undefined`):
+
+```ts
+function callHost<K extends keyof Methods>(
+  method: K,
+  params: Parameters<Methods[K]>[0],
+) {
+  return bridge.call(method, params);
+}
+```
 
 ```ts
 const bridge = createBridge<Methods, Events>();
@@ -65,6 +74,12 @@ if (bridge.available) {
 
 The promise rejects with `GawaError`. A method that returns nothing still resolves to `null`, because the reply's `result` is JSON `null`.
 
+```ts
+has(method: string): Promise<boolean | null>;
+```
+
+`has` asks the host which methods it registered, by calling the reserved method `gawa.methods`. It resolves `true` or `false` from that list. It resolves `false` when no host is attached. It resolves `null` when the host does not implement `gawa.methods` (an older shell replies `unknown_method`) or the query fails. `has` does not reject. `null` means the page cannot tell: call the method and treat `unknown_method` as "not registered". The code `unknown_method`, message `unknown method: <name>`, is stable.
+
 ## Events
 
 ```ts
@@ -74,7 +89,7 @@ on<K extends keyof E & string>(
 ): () => void;
 ```
 
-`on` listens for a native event and returns a function that stops listening. If the envelope has no `data`, the listener receives `null`. A listener that throws is rethrown on a timer, so the other listeners for that event still run.
+`on` listens for a native event and returns a function that stops listening. If the envelope has no `data`, the listener receives `null`. When the event's data type is `null` or `void`, the listener may take no argument. A listener that throws is rethrown on a timer, so the other listeners for that event still run.
 
 ```ts
 const off = bridge.on("back", () => {

@@ -10,6 +10,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.serializer
 
 /**
@@ -20,7 +21,7 @@ import kotlinx.serialization.serializer
  * val bridge = GawaBridge(webView)          // before loading the page
  * bridge.router.register<Unit, String>("app.version") { "1.0" }
  * webView.loadUrl(GawaAssets.url())
- * bridge.emit("back", null as String?)
+ * bridge.emit("back")
  * ```
  *
  * Only pages from [allowedOrigins] get the `gawa` object, and only messages
@@ -69,7 +70,13 @@ public class GawaBridge @MainThread constructor(
         }
     }
 
-    /** Sends an event to the page (`bridge.on(event, …)` on the web side). */
+    /** Sends an event with no payload (`data` is JSON `null`). */
+    public fun emit(event: String) {
+        emitRaw(event, JsonNull)
+    }
+
+    /** Sends an event to the page (`bridge.on(event, …)` on the web side).
+     *  Pass `null as String?` for no data; [emit] with one argument does the same. */
     public inline fun <reified D> emit(event: String, data: D) {
         emitRaw(event, router.json.encodeToJsonElement(serializer<D>(), data))
     }

@@ -10,7 +10,8 @@ Messages are JSON strings. Every envelope carries `"gawa": 1`.
 SPEC.md defines the request, the Android hello, the reply, and the event.
 The error codes `unknown_method`, `invalid_params`, `internal`,
 `unavailable`, and `timeout` are defined there, including which side emits
-each one. iOS delivers events with `__gawa.receive`. Android delivers
+each one. `unknown_method` is the stable code for a method the host did not
+register. `gawa.methods` lists the names a current router has registered. iOS delivers events with `__gawa.receive`. Android delivers
 replies and events with `JavaScriptReplyProxy`, and the listener is created
 with `allowedOriginRules`.
 

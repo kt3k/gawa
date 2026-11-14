@@ -50,15 +50,41 @@ export declare class GawaError extends Error {
     readonly code: string;
     constructor(code: string, message: string);
 }
+/** Methods whose parameter list is not a required tuple (`()` or an untyped function). */
+type NoParamKeys<M extends MethodMap> = {
+    [K in keyof M & string]: Parameters<M[K]> extends readonly [unknown, ...unknown[]] ? never : K;
+}[keyof M & string];
+/** Methods that take one required parameter. */
+type ParamKeys<M extends MethodMap> = {
+    [K in keyof M & string]: Parameters<M[K]> extends readonly [unknown, ...unknown[]] ? K : never;
+}[keyof M & string];
 export interface Bridge<M extends MethodMap, E extends EventMap> {
     /** True when a native host is attached. */
     readonly available: boolean;
     /** Which native host is attached, if any. */
     readonly platform: Platform | null;
-    /** Calls a native method. Rejects with {@link GawaError}. */
-    call<K extends keyof M & string>(method: K, ...params: Parameters<M[K]>): Promise<Awaited<ReturnType<M[K]>>>;
-    /** Listens to a native event; returns a function that stops listening. */
+    /**
+     * Calls a native method. Rejects with {@link GawaError}.
+     *
+     * A method with a parameter takes that value. A method with no parameter
+     * is called with no second argument. A generic key also works:
+     * `call<K extends keyof M>(method: K, params: Parameters<M[K]>[0])`.
+     */
+    call<K extends ParamKeys<M> & string>(method: K, params: Parameters<M[K]>[0]): Promise<Awaited<ReturnType<M[K]>>>;
+    call<K extends NoParamKeys<M> & string>(method: K): Promise<Awaited<ReturnType<M[K]>>>;
+    call<K extends keyof M & string>(method: K, params: Parameters<M[K]>[0]): Promise<Awaited<ReturnType<M[K]>>>;
+    /**
+     * Listens to a native event; returns a function that stops listening.
+     * When `E[K]` is `null` or `void`, the listener may take no argument.
+     */
     on<K extends keyof E & string>(event: K, listener: (data: E[K]) => void): () => void;
+    /**
+     * Whether the host registered `method`. Resolves `false` when no host is
+     * attached, `true` or `false` from `gawa.methods` when the host lists its
+     * methods, and `null` when it does not (an older shell) or the query fails.
+     * It does not reject.
+     */
+    has(method: string): Promise<boolean | null>;
 }
 export interface BridgeOptions {
     /** Rejects calls that get no reply within this many ms (0 = never). */

@@ -184,6 +184,16 @@ export function createBridge(options = {}) {
         platform: c.transport?.platform ?? null,
         call: (method, ...params) => c.call(method, params[0], timeout),
         on: (event, listener) => c.on(event, listener),
+        has(method) {
+            if (!c.transport)
+                return Promise.resolve(false);
+            return c.call("gawa.methods", undefined, timeout).then((result) => {
+                if (!Array.isArray(result) ||
+                    result.some((name) => typeof name !== "string"))
+                    return null;
+                return result.includes(method);
+            }, () => null);
+        },
     };
 }
 /**
@@ -221,6 +231,13 @@ export function installMock(options = {}) {
             return;
         calls.push({ method: req.method, params: req.params });
         const id = req.id;
+        if (req.method === "gawa.methods") {
+            return JSON.stringify({
+                gawa: PROTOCOL,
+                id,
+                result: Object.keys(handlers).filter((name) => name !== "gawa.methods"),
+            });
+        }
         try {
             const handler = handlers[req.method];
             if (!handler) {
