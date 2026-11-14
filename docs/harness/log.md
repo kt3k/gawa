@@ -5,6 +5,16 @@ Short notes from maintenance passes. User-visible changes also go in
 
 ## 2026-11-14
 
+Landing hero: replaced the three-row "Page / gawa / WebView" stack with the
+page call and the app handler side by side (TypeScript next to Swift /
+Kotlin tabs, `call` and `emit` arrows between them). The survey of developer
+tool landing pages behind this: library heroes show code, and two-sided
+tools show both ends. The lower "Quick example" is now "Full example".
+`cd site && deno task check` passed. Checked desktop, phone, and dark mode
+in screenshots.
+
+## 2026-11-14
+
 Schema generator: nullable types, arrays, named structs emitted once
 (including result types), and payload-less events. Empty event lists no
 longer generate `{}`. CLI flags `--schema`, `--ts`, `--swift`, `--kotlin`,

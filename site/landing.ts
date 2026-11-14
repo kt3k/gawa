@@ -103,7 +103,7 @@ dependencies {
     },
   ]);
 
-  const example = tabset("example", "Quick example", [
+  const example = tabset("example", "Full example", [
     {
       id: "web",
       label: "Web",
@@ -188,31 +188,80 @@ bridge.emit("back")
     },
   ]);
 
+  const heroPage = tabset("hero-page", "Page", [
+    {
+      id: "ts",
+      label: "Page · TypeScript",
+      html: blocks([{
+        lang: "ts",
+        code: `const bridge = createBridge<Methods, Events>();
+
+// Call the app and get a typed reply.
+const lang = await bridge.call("kv.get", { key: "lang" });
+
+// Listen for events from the app.
+bridge.on("back", () => closeDialog());
+`,
+      }]),
+    },
+  ]);
+  const heroApp = tabset("hero-app", "App", [
+    {
+      id: "swift",
+      label: "iOS · Swift",
+      html: blocks([{
+        lang: "swift",
+        code: `// Answer the page's call.
+bridge.router.register("kv.get") { (p: KVGet) -> String? in
+    UserDefaults.standard.string(forKey: p.key)
+}
+
+// Send the page an event.
+try bridge.emit("back")
+`,
+      }]),
+    },
+    {
+      id: "kotlin",
+      label: "Android · Kotlin",
+      html: blocks([{
+        lang: "kotlin",
+        code: `// Answer the page's call.
+bridge.router.register<KVGet, String?>("kv.get") {
+    prefs.getString(it.key, null)
+}
+
+// Send the page an event.
+bridge.emit("back")
+`,
+      }]),
+    },
+  ]);
+
   return `<div class="wrap home">
   <section class="hero">
     <p class="hero-kana" lang="ja">側</p>
-    <div class="hero-grid">
-      <div>
-        <p class="eyebrow"><span class="pill">v${
+    <div class="hero-intro">
+      <p class="eyebrow"><span class="pill">v${
     escapeHtml(version)
   }</span> Web · iOS 15+ · Android 24+</p>
-        <h1>gawa</h1>
-        <p class="lede">the shell around something.</p>
-        <p class="hero-copy">A thin, typed bridge between a web page and the native iOS / Android app that hosts it in a WebView. Nothing more: no runtime, no plugin system, no CLI, no opinion about your screens.</p>
-        <div class="actions">
-          <a class="button" href="${started}">Get started</a>
-          <a class="button button-ghost" href="${GITHUB}">View on GitHub</a>
-        </div>
-      </div>
-      <div>
-        <ol class="stack" aria-label="Where gawa sits">
-          <li><span class="stack-k">Page</span><span><code>call</code> / <code>on</code></span></li>
-          <li class="stack-gawa"><span class="stack-k">gawa</span><span>typed RPC and events</span></li>
-          <li><span class="stack-k">WebView</span><span>WKWebView or WebView</span></li>
-        </ol>
-        <p class="side-note">It works in an app you already have — add a WKWebView / WebView anywhere and attach gawa to it.</p>
+      <h1>gawa</h1>
+      <p class="lede">the shell around something.</p>
+      <p class="hero-copy">A thin, typed bridge between a web page and the native iOS / Android app that hosts it in a WebView. Nothing more: no runtime, no plugin system, no CLI, no opinion about your screens.</p>
+      <div class="actions">
+        <a class="button" href="${started}">Get started</a>
+        <a class="button button-ghost" href="${GITHUB}">View on GitHub</a>
       </div>
     </div>
+    <div class="hero-pair">
+      ${heroPage}
+      <div class="hero-flow" aria-hidden="true">
+        <span><code>call</code> <i class="arrow-x">→</i><i class="arrow-y">↓</i></span>
+        <span><i class="arrow-x">←</i><i class="arrow-y">↑</i> <code>emit</code></span>
+      </div>
+      ${heroApp}
+    </div>
+    <p class="hero-note">The same method name on both ends, typed on both ends. Only your bundled page can call it. Attach it to a WKWebView / WebView in an app you already have.</p>
   </section>
 
   <section id="features">
@@ -263,8 +312,8 @@ bridge.emit("back")
   </section>
 
   <section id="example">
-    <h2 class="section-title">Quick example</h2>
-    <p class="section-intro">Describe what the app implements. The same method names are registered on the native side.</p>
+    <h2 class="section-title">Full example</h2>
+    <p class="section-intro">The page describes what the app implements. Each platform serves the bundled page, registers the same method names, and attaches the bridge.</p>
     ${example}
     <p class="caption">Calls reject with <code>GawaError</code> (<code>err.code</code>, <code>err.message</code>). In a normal browser, <code>available</code> is false. <a href="${why}">Why gawa, next to Capacitor and others</a>.</p>
   </section>
