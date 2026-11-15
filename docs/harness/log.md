@@ -3,6 +3,16 @@
 Short notes from maintenance passes. User-visible changes also go in
 `CHANGELOG.md` under `## Unreleased`. Newest first.
 
+## 2026-11-15
+
+`main` will require the CI checks `web`, `ios`, `android`, and `android-e2e`
+before a merge. Only the repository admin (@kt3k) may bypass that ruleset
+and push directly. Agents, including the weekly harness loop, push a working
+branch, open a pull request against `main`, wait for those checks, and merge.
+The maintainer does not want issue labels such as `good first issue`; do not
+create them. `ci` runs on pull requests targeting `main` as well as on pushes
+to `main`. Job names are unchanged.
+
 ## 2026-11-14
 
 Landing copy pass against general copywriting advice (clear beats clever,

@@ -53,7 +53,9 @@ intentionally change those phrases.
 
 These need macOS with Swift, or an Android SDK. They are not part of
 `scripts/health.ts`. GitHub Actions runs them on every push to `main` and
-every pull request (`.github/workflows/ci.yml`):
+every pull request targeting `main` (`.github/workflows/ci.yml`). The check
+names GitHub reports, and the ones the `main` ruleset requires, are `web`,
+`ios`, `android`, and `android-e2e`:
 
 - iOS: `examples/web/build.sh`, then `swift test`, an iOS library build, and
   an XcodeGen build of `examples/ios`.

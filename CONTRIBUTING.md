@@ -16,6 +16,13 @@ unless the maintainer has agreed to it in the open.
 Open an issue before a large pull request. A small doc or test fix can be a
 pull request directly.
 
+## Pull requests
+
+Do not push to `main`. Push a working branch and open a pull request against
+`main`. The CI checks `web`, `ios`, `android`, and `android-e2e` have to pass
+before the pull request is merged. Only the repository admin (@kt3k) may
+bypass that ruleset and push directly.
+
 ## Checks
 
 The commands are listed in [docs/harness/verify.md](docs/harness/verify.md).

@@ -13,7 +13,8 @@ deno run -A scripts/health.ts
 
 The script runs the web tests, the site check, and the drift checks. It
 prints the iOS and Android jobs it did not run. Those run in GitHub Actions
-on `main`. If `health.ts` fails, fix that before looking for new work.
+on pull requests into `main` and on pushes to `main`. If `health.ts` fails,
+fix that before looking for new work.
 
 Also skim, without inventing numbers:
 
@@ -53,7 +54,7 @@ generated file changes, regenerate it. Do not reformat unrelated files.
 
 Run the commands in [verify.md](verify.md) for the files you touched, then
 `deno run -A scripts/health.ts` again. iOS and Android still have to pass in
-CI after the push. Do not claim they passed if you did not run them.
+CI on the pull request. Do not claim they passed if you did not run them.
 
 ## 6. Record
 
@@ -61,6 +62,7 @@ Append a short entry to [log.md](log.md): the date, what changed, what you
 ran, and what you left undone. Move a finished backlog item out of
 [backlog.md](backlog.md), or say why it is still open.
 
-Push only when the task says to push. This repository's standing instruction
-from the maintainer has been to push maintenance work to `main`. A release
-tag is never part of the loop.
+Do not push to `main`. Push a working branch and open a pull request against
+`main`. Wait until the required checks `web`, `ios`, `android`, and
+`android-e2e` pass, then merge. Only the repository admin (@kt3k) may bypass
+the ruleset and push directly. A release tag is never part of the loop.

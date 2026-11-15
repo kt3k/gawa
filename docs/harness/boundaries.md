@@ -48,5 +48,9 @@ to grow one.
 
 ## Permissions and branch rules
 
-Do not change GitHub branch protection, repository secrets, or who has
-write access. Those are account settings, not files.
+`main` requires the CI checks `web`, `ios`, `android`, and `android-e2e`
+before a merge. Only the repository admin (@kt3k) may bypass that ruleset
+and push directly. Agents, including the weekly harness loop, push a working
+branch, open a pull request against `main`, wait for those checks, and merge.
+Do not change the ruleset, repository secrets, or who has write access.
+Those are account settings, not files.

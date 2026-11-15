@@ -44,7 +44,7 @@ are listed in [harness/backlog.md](harness/backlog.md).
 - MIT license at `LICENSE`. README, docs site, and `SPEC.md` say what the software is and how to obtain the reference packages.
 - Version `0.1.0` is shared by `package.json` and the Android default. Tags `vX.Y.Z` are what Deno, Swift Package Manager, and JitPack install. `scripts/check-versions.ts` refuses a tag that does not match.
 - `CHANGELOG.md` exists. The release workflow turns one version section into the GitHub Release notes. It is not a `git log`.
-- CI on every push to `main` and every pull request runs the web tests, the protocol fixtures, the generated-type diff, and the iOS and Android builds. The commands are in [harness/verify.md](harness/verify.md).
+- CI on every push to `main` and every pull request targeting `main` runs the web tests, the protocol fixtures, the generated-type diff, and the iOS and Android builds. The check names are `web`, `ios`, `android`, and `android-e2e`. A merge into `main` requires them. Only the repository admin may bypass that ruleset. The commands are in [harness/verify.md](harness/verify.md).
 - `protocol/cases.json` is the shared behavior check for the page and the router.
 
 ## What this repository does not copy

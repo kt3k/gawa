@@ -15,6 +15,10 @@ not copied onto this site:
 - [docs/oss-practices.md](https://github.com/kt3k/gawa/blob/main/docs/oss-practices.md)
   — the sources those rules come from
 
+Changes land through a pull request into `main`. The CI checks `web`, `ios`,
+`android`, and `android-e2e` have to pass before the merge. Only the
+repository admin may push directly to `main`.
+
 Local check:
 
 ```sh

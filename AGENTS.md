@@ -16,6 +16,10 @@ whole manual into the task.
 - Do not hand-edit `web/dist` or the generated example types. Regenerate them.
 - Verify with [docs/harness/verify.md](docs/harness/verify.md). The local
   bundle is `deno run -A scripts/health.ts`. iOS and Android run in CI.
+- Do not push to `main`. Push a working branch, open a pull request against
+  `main`, wait until the checks `web`, `ios`, `android`, and `android-e2e`
+  pass, then merge. Only the repository admin (@kt3k) may bypass that
+  ruleset and push directly.
 - Stop for a release, a breaking change, a vulnerability, or an external post.
   [docs/harness/boundaries.md](docs/harness/boundaries.md)
 

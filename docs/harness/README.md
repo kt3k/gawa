@@ -31,4 +31,5 @@ tag or publish from a maintenance pass. See [boundaries.md](boundaries.md).
 4. Make the change. Update `SPEC.md` and `protocol/cases.json` together when behavior changes.
 5. Run the commands in [verify.md](verify.md) that the change touches, then `scripts/health.ts` again.
 6. Add a dated note to [log.md](log.md). If a user will notice the change, add it under `## Unreleased` in `CHANGELOG.md`.
-7. Stop at a [boundary](boundaries.md) instead of guessing.
+7. Push a working branch, open a pull request against `main`, and merge it only after `web`, `ios`, `android`, and `android-e2e` pass. Do not push to `main`.
+8. Stop at a [boundary](boundaries.md) instead of guessing.

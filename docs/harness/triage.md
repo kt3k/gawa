@@ -30,8 +30,8 @@ should show the commands from [verify.md](verify.md) that were run.
 
 Accept it only when:
 
-- CI is green, including the iOS and Android jobs when those files can be
-  affected.
+- The required checks `web`, `ios`, `android`, and `android-e2e` are green.
+  Merge the pull request. Do not push the branch onto `main`.
 - It does not break the public API. See [principles.md](principles.md).
 - Protocol changes include `SPEC.md` and `protocol/cases.json`.
 - User-visible changes are under `## Unreleased` in `CHANGELOG.md`.

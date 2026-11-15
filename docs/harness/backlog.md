@@ -22,18 +22,20 @@ need a fact only the maintainer knows. Do not invent it.
 - **Response expectations.** The maintainer guides suggest writing down how
   much time the project gets. Do not invent a number of hours or a reply
   deadline.
-- **Labels** such as `good first issue`. Creating labels is a repository
-  setting. The issue templates do not set labels, so they do not depend on
-  labels that are not there.
-- **Branch protection** that requires the CI checks before a merge to
-  `main`. [Scorecard's beginner guide](https://github.com/ossf/scorecard/blob/main/docs/beginner-checks.md)
-  recommends this. It is a GitHub setting.
 - **Signed releases.** Scorecard checks for them. Not required for a useful
   gawa release. Decide only if a consumer asks.
 - **Dependency bots beyond GitHub Actions.** Dependabot is enabled for
   Actions only. npm, Gradle, and Swift Package Manager updates are left off
   until the maintainer wants the noise. The reference packages themselves
   are installed from git tags, not from a floating registry range.
+
+## Decided
+
+- **No issue labels.** The maintainer does not want labels such as
+  `good first issue`. Do not create them.
+- **`main` ruleset.** A merge into `main` requires the CI checks `web`,
+  `ios`, `android`, and `android-e2e`. Only the repository admin (@kt3k) may
+  bypass it. Agents use a pull request. See [log.md](log.md).
 
 ## Safe to do later, without a new fact
 
