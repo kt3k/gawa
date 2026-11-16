@@ -1,7 +1,8 @@
 /**
- * Local half of gawa's CI: web tests, generated-file drift, and the site.
- * iOS and Android are printed, not run. They need macOS or an Android SDK
- * and already run in .github/workflows/ci.yml.
+ * Local half of gawa's CI: web tests, generated-file drift, the site,
+ * and read-only workflow tokens. iOS and Android are printed, not run.
+ * They need macOS or an Android SDK and already run in
+ * .github/workflows/ci.yml.
  *
  *   deno run -A scripts/health.ts
  */
@@ -76,6 +77,12 @@ await run("web test", [deno, "test"], `${root}/web`);
 await run("web/dist drift", ["bash", "web/build.sh"]);
 await run("web/dist diff", ["git", "diff", "--exit-code", "--", "web/dist"]);
 await run("versions", [deno, "run", "-A", "scripts/check-versions.ts"]);
+await run("workflow tokens", [
+  deno,
+  "run",
+  "-A",
+  "scripts/check-workflow-permissions.ts",
+]);
 await run("schema fmt", [deno, "fmt", "--check", "schema"]);
 await run("schema lint", [deno, "lint", "schema"]);
 await run("schema test", [

@@ -9,11 +9,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# contents: read for checkout. pages + id-token for the official deploy action.
+# Read-only by default. configure-pages calls Get a GitHub Pages site,
+# which needs pages: read. Publishing stays on the deploy job.
 permissions:
   contents: read
-  pages: write
-  id-token: write
+  pages: read
 
 # One Pages deployment at a time. Don't cancel one that is already publishing.
 concurrency:
@@ -62,6 +62,10 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    # Replaces the workflow permissions. deploy-pages needs both.
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

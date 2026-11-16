@@ -45,6 +45,7 @@ are listed in [harness/backlog.md](harness/backlog.md).
 - Version `0.1.0` is shared by `package.json` and the Android default. Tags `vX.Y.Z` are what Deno, Swift Package Manager, and JitPack install. `scripts/check-versions.ts` refuses a tag that does not match.
 - `CHANGELOG.md` exists. The release workflow turns one version section into the GitHub Release notes. It is not a `git log`.
 - CI on every push to `main` and every pull request targeting `main` runs the web tests, the protocol fixtures, the generated-type diff, and the iOS and Android builds. The check names are `web`, `ios`, `android`, and `android-e2e`. A merge into `main` requires them. Only the repository admin may bypass that ruleset. The commands are in [harness/verify.md](harness/verify.md).
+- Workflow tokens are read-only above `jobs:`. `contents: write` is only on the release job. `pages: write` and `id-token: write` are only on the Pages deploy job. The build job keeps `pages: read` so it can read the site's base path. `scripts/check-workflow-permissions.ts` rejects a top-level write.
 - `protocol/cases.json` is the shared behavior check for the page and the router.
 
 ## What this repository does not copy

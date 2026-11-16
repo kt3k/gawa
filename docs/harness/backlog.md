@@ -39,10 +39,6 @@ need a fact only the maintainer knows. Do not invent it.
 
 ## Safe to do later, without a new fact
 
-- Declare least-privilege `permissions` on the CI workflow tokens.
-  `release.yml` already sets `contents: write`. The other workflows should
-  be read against Scorecard's Token-Permissions check before they are
-  tightened, so a job that uploads Pages is not broken.
 - Add a `## Unreleased` note whenever a user-visible change lands. The
   heading exists. The `0.1.0` section has no date; leave it.
 - Keep `protocol/cases.json` covering every new error code or envelope rule.
