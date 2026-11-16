@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+# The jobs check out the repo and run tests. They do not push or publish.
+permissions:
+  contents: read
+
 jobs:
   web:
     runs-on: ubuntu-latest
@@ -26,6 +30,8 @@ jobs:
         run: web/build.sh && git diff --exit-code -- web/dist
       - name: package.json and Android version match
         run: deno run -A scripts/check-versions.ts
+      - name: workflow tokens are read-only at the top level
+        run: deno run -A scripts/check-workflow-permissions.ts
       - name: schema generator
         run: >-
           deno fmt --check schema && deno lint schema &&

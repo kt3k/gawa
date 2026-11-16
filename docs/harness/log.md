@@ -3,6 +3,20 @@
 Short notes from maintenance passes. User-visible changes also go in
 `CHANGELOG.md` under `## Unreleased`. Newest first.
 
+## 2026-11-16
+
+Workflow tokens follow Scorecard's Token-Permissions check: read-only at
+the top of each workflow, write only on the job that needs it. `ci.yml`
+had no `permissions` key; it is now `contents: read`. The jobs check out
+the repo and run tests. `pages.yml` keeps `pages: read` because
+`actions/configure-pages` calls Get a GitHub Pages site, and moves
+`pages: write` and `id-token: write` onto the deploy job, which is what
+`actions/deploy-pages` documents. `release.yml` moves `contents: write`
+onto the release job. `scripts/check-workflow-permissions.ts` fails a
+workflow that omits that block or grants write above `jobs:`. It runs in
+`scripts/health.ts` and in the `web` CI job. `deno run -A scripts/health.ts`
+passed. iOS and Android were not run locally.
+
 ## 2026-11-15
 
 `main` will require the CI checks `web`, `ios`, `android`, and `android-e2e`
