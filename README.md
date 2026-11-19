@@ -124,7 +124,7 @@ cd android
 ## Web
 
 ```ts
-import { createBridge, GawaError } from "@kt3k/gawa";
+import { createBridge, GawaError } from "gawa";
 
 // Describe what your app implements.
 type Methods = {
