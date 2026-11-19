@@ -61,5 +61,5 @@ Do not create the tag yourself unless the person who owns the repository
 asked for that version. Deno, Swift Package Manager, and JitPack install
 from the tag, so a tag is the release.
 
-`0.1.0` is the only released section today, and it has no date recorded.
-Leave that section as it is.
+`0.1.0` has no date on the heading. `scripts/check-versions.ts` matches
+`## 0.1.0` exactly, so do not append a date.
