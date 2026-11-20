@@ -1,0 +1,54 @@
+name: Publish release
+description: >
+  Create the GitHub Release from the CHANGELOG section and publish to npm
+  when NPM_TOKEN is set. The tag must already exist.
+
+inputs:
+  tag:
+    description: Tag name, including the leading v.
+    required: true
+  npm-token:
+    description: npm token. Empty skips npm publish.
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: denoland/setup-deno@v2
+      with:
+        deno-version: v2.x
+
+    - name: Versions match the tag
+      shell: bash
+      run: deno run -A scripts/check-versions.ts "${{ inputs.tag }}"
+
+    - name: Release notes
+      shell: bash
+      run: deno run -A scripts/release-notes.ts "${{ inputs.tag }}" > notes.md
+
+    - name: GitHub Release
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release create "${{ inputs.tag }}" \
+          --title "${{ inputs.tag }}" \
+          --notes-file notes.md \
+          --verify-tag
+
+    - uses: actions/setup-node@v7
+      with:
+        node-version: 22
+        registry-url: https://registry.npmjs.org
+
+    - name: Publish to npm
+      shell: bash
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
+      run: |
+        if [ -z "${NODE_AUTH_TOKEN}" ]; then
+          echo "NPM_TOKEN is not set; skipping npm publish"
+          exit 0
+        fi
+        npm publish --access public

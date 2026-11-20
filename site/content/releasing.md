@@ -1,11 +1,12 @@
 # Releasing
 
-Deno, Swift Package Manager, and JitPack install from a git tag. npm can install from that tag too. Pushing the tag also publishes to the npm registry when the `NPM_TOKEN` secret is set.
+Deno, Swift Package Manager, and JitPack install from a git tag. npm can install from that tag too. The release publishes to the npm registry when the `NPM_TOKEN` secret is set.
 
 1. Bump the version in `package.json` and the default in `android/gawa/build.gradle.kts` (`findProperty("publishVersion") ?: "…"`). CI checks that those two strings match.
-2. Add a `## X.Y.Z` section to `CHANGELOG.md`.
+2. Add a `## X.Y.Z` section to `CHANGELOG.md`. Do not put a date on that heading. `scripts/check-versions.ts` matches `## X.Y.Z` exactly.
 3. Run `web/build.sh` and commit `web/dist`. CI fails if that directory is stale: the web job runs `web/build.sh && git diff --exit-code -- web/dist`.
-4. Tag `vX.Y.Z` and push the tag. [`.github/workflows/release.yml`](https://github.com/kt3k/gawa/blob/main/.github/workflows/release.yml) checks the tag against `package.json` and `CHANGELOG.md`, then creates the GitHub Release from that changelog section.
+4. Merge to `main` and wait until the checks `web`, `ios`, `android`, and `android-e2e` succeed on that commit.
+5. On GitHub, open Actions, choose the `release` workflow, and run it on `main`. Leave the version input empty to use `package.json`, or type `X.Y.Z` without a leading `v`. [`.github/workflows/release.yml`](https://github.com/kt3k/gawa/blob/main/.github/workflows/release.yml) refuses any other ref, checks the version against `package.json` and `CHANGELOG.md`, refuses a tag that already exists, then tags `vX.Y.Z` and creates the GitHub Release from that changelog section. Pushing the tag by hand still runs the same publish steps. A tag created by the workflow does not start a second run.
 
 `web/build.sh` compiles `web/mod.ts` to `web/dist/mod.js` and `web/dist/mod.d.ts` with `tsc` (`--target es2020`), run via Deno. `package.json` lists those files in `files` and points `exports` at them, which is why `npm install github:kt3k/gawa#vX.Y.Z` works from the tag.
 

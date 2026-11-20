@@ -25,8 +25,9 @@ Local check:
 deno run -A scripts/health.ts
 ```
 
-iOS and Android still run in GitHub Actions. Releasing is a separate, human
-step. See [Releasing](/docs/releasing/).
+iOS and Android still run in GitHub Actions. A release is cut from `main`
+with the `release` workflow (Actions, Run workflow), not by pushing a tag.
+See [Releasing](/docs/releasing/).
 
 ## Security
 

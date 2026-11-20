@@ -1,4 +1,6 @@
-# Tag vX.Y.Z creates a GitHub Release from CHANGELOG.md.
+# Cut a release from main, or finish one an admin started by pushing a tag.
+# A tag pushed with GITHUB_TOKEN does not start this workflow again, so the
+# dispatch path creates the tag and the GitHub Release in the same run.
 # npm publish runs only when the NPM_TOKEN secret is set.
 # Deno, Swift Package Manager, and JitPack install from the tag itself.
 
@@ -7,50 +9,110 @@ name: release
 on:
   push:
     tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version without a leading v. Leave empty to use package.json.
+        required: false
+        type: string
+        default: ""
 
-# Read-only except the release job, which creates the GitHub Release.
+# Read-only except the jobs that create the tag and the GitHub Release.
 permissions:
   contents: read
 
 jobs:
+  # An admin pushed vX.Y.Z. The tag already exists.
   release:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v7
+      - uses: ./.github/actions/publish-release
+        with:
+          tag: ${{ github.ref_name }}
+          npm-token: ${{ secrets.NPM_TOKEN }}
+
+  # Actions tab, Run workflow, branch main.
+  dispatch:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      checks: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Only main can be released
+        shell: bash
+        run: |
+          if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
+            echo "::error::Releases are cut from refs/heads/main (this ref is ${GITHUB_REF})."
+            exit 1
+          fi
+
+      - name: Resolve the version
+        id: version
+        shell: bash
+        run: |
+          version="${{ inputs.version }}"
+          version="${version#v}"
+          if [ -z "${version}" ]; then
+            version="$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')"
+          fi
+          if ! printf '%s' "${version}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::version must be X.Y.Z (got '${version}')."
+            exit 1
+          fi
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          echo "tag=v${version}" >> "${GITHUB_OUTPUT}"
+
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
-      - name: Versions match the tag
-        run: deno run -A scripts/check-versions.ts
+      - name: Versions match the changelog
+        shell: bash
+        run: deno run -A scripts/check-versions.ts "${{ steps.version.outputs.tag }}"
 
-      - name: Release notes
-        id: notes
+      - name: Tag must not already exist
+        shell: bash
         run: |
-          deno run -A scripts/release-notes.ts "${GITHUB_REF_NAME}" > notes.md
-          echo "path=notes.md" >> "$GITHUB_OUTPUT"
+          tag="${{ steps.version.outputs.tag }}"
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "::error::tag ${tag} already exists."
+            exit 1
+          fi
 
-      - name: GitHub Release
+      - name: Required CI checks succeeded on this commit
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" \
-            --title "${GITHUB_REF_NAME}" \
-            --notes-file notes.md
+          sha="$(git rev-parse HEAD)"
+          for name in web ios android android-e2e; do
+            conclusion="$(gh api --jq '.check_runs | sort_by(.started_at) | last | .conclusion // ""' \
+              "/repos/${GITHUB_REPOSITORY}/commits/${sha}/check-runs?check_name=${name}&per_page=100")"
+            if [ "${conclusion}" != "success" ]; then
+              echo "::error::required check ${name} on ${sha} is '${conclusion:-missing}', not success."
+              exit 1
+            fi
+          done
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
-
-      - name: Publish to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create and push the tag
+        shell: bash
         run: |
-          if [ -z "${NODE_AUTH_TOKEN}" ]; then
-            echo "NPM_TOKEN is not set; skipping npm publish"
-            exit 0
-          fi
-          npm publish --access public
+          tag="${{ steps.version.outputs.tag }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${tag}" -m "${tag}"
+          git push origin "refs/tags/${tag}"
+
+      - uses: ./.github/actions/publish-release
+        with:
+          tag: ${{ steps.version.outputs.tag }}
+          npm-token: ${{ secrets.NPM_TOKEN }}
