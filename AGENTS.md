@@ -21,6 +21,8 @@ whole manual into the task.
   pass, then merge. Only the repository admin (@kt3k) may bypass that
   ruleset and push directly.
 - Stop for a release, a breaking change, a vulnerability, or an external post.
+  A release is cut by the maintainer from `main` (Actions, workflow
+  `release`, Run workflow), not by pushing a tag yourself.
   [docs/harness/boundaries.md](docs/harness/boundaries.md)
 
 ## Where things are

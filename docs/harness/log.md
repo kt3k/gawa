@@ -3,6 +3,18 @@
 Short notes from maintenance passes. User-visible changes also go in
 `CHANGELOG.md` under `## Unreleased`. Newest first.
 
+## 2026-11-19
+
+Releases are cut from `main` with workflow_dispatch on `.github/workflows/release.yml`
+(Actions, workflow `release`, Run workflow). An empty version input uses
+`package.json`. The run refuses any ref other than `refs/heads/main`, a
+missing changelog section, an existing tag, and a main commit whose `web`,
+`ios`, `android`, or `android-e2e` check is not success. It pushes `vX.Y.Z`
+and creates the GitHub Release in that same run, because a tag pushed with
+`GITHUB_TOKEN` does not start another workflow. Pushing a tag by hand still
+runs the shared publish action. `contents: write` stays on those jobs only.
+The workflow was not run.
+
 ## 2026-11-16
 
 Workflow tokens follow Scorecard's Token-Permissions check: read-only at

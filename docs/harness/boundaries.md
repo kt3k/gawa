@@ -12,9 +12,11 @@ This repository does not. Propose it. Do not ship it.
 
 ## Releases and publishing
 
-Do not push a tag, create a GitHub Release, or publish to npm. The release
-workflow uses the built-in `GITHUB_TOKEN` for the GitHub Release and the
-`NPM_TOKEN` secret for npm. Do not read, print, or invent either value.
+Do not push a tag, run the `release` workflow, create a GitHub Release, or
+publish to npm unless the maintainer asked for that version. The maintainer
+cuts a release from `main` with Actions, workflow `release`, Run workflow.
+The workflow uses `GITHUB_TOKEN` for the tag and the GitHub Release, and
+`NPM_TOKEN` for npm. Do not read, print, or invent either value.
 
 ## Security
 

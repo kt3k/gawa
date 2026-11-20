@@ -49,17 +49,21 @@ in the README and in `site/content/releasing.md`:
 
 1. Bump `package.json` and the default version in
    `android/gawa/build.gradle.kts` to the same `X.Y.Z`.
-2. Move `## Unreleased` notes into `## X.Y.Z`. Use `YYYY-MM-DD` when you know
-   the date. Do not paste `git log`.
+2. Move `## Unreleased` notes into `## X.Y.Z`. The heading has no date.
+   `scripts/check-versions.ts` matches `## X.Y.Z` exactly. Do not paste
+   `git log`.
 3. Run `web/build.sh` and commit `web/dist` if it changed.
-4. Run `deno run -A scripts/check-versions.ts vX.Y.Z`.
-5. Tag `vX.Y.Z` and push the tag. `.github/workflows/release.yml` checks the
-   tag, opens the GitHub Release from that changelog section, and runs
-   `npm publish` only when the `NPM_TOKEN` secret is set.
+4. Merge to `main` and wait until `web`, `ios`, `android`, and `android-e2e`
+   succeed on that commit.
+5. The maintainer cuts the release from `main`: Actions, workflow `release`,
+   Run workflow. Leave the version empty to use `package.json`, or type
+   `X.Y.Z`. The workflow tags `vX.Y.Z` and opens the GitHub Release from
+   that changelog section. `npm publish` runs only when `NPM_TOKEN` is set.
+   Pushing the tag by hand still runs those publish steps.
 
-Do not create the tag yourself unless the person who owns the repository
-asked for that version. Deno, Swift Package Manager, and JitPack install
-from the tag, so a tag is the release.
+Do not run that workflow, push a tag, or create a GitHub Release unless the
+person who owns the repository asked for that version. Deno, Swift Package
+Manager, and JitPack install from the tag, so a tag is the release.
 
 `0.1.0` has no date on the heading. `scripts/check-versions.ts` matches
 `## 0.1.0` exactly, so do not append a date.

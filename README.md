@@ -221,10 +221,16 @@ own client.
 1. Bump the version in `package.json` and the default in
    `android/gawa/build.gradle.kts`.
 2. Run `web/build.sh` and commit `web/dist` (CI fails if it is stale).
-3. Add a `## X.Y.Z` section to `CHANGELOG.md`.
-4. Tag `vX.Y.Z` and push the tag. Deno, Swift Package Manager, and JitPack
-   consume the tag. The release workflow creates the GitHub Release from the
-   changelog and publishes to npm when `NPM_TOKEN` is set.
+3. Add a `## X.Y.Z` section to `CHANGELOG.md`. The heading has no date:
+   `scripts/check-versions.ts` matches `## X.Y.Z` exactly.
+4. Merge that to `main` and wait until `web`, `ios`, `android`, and
+   `android-e2e` succeed on that commit.
+5. Cut the release from `main`: Actions, workflow `release`, Run workflow.
+   Leave the version input empty to use `package.json`, or type `X.Y.Z`.
+   The workflow tags `vX.Y.Z`, opens the GitHub Release from that changelog
+   section, and publishes to npm when `NPM_TOKEN` is set. Deno, Swift
+   Package Manager, and JitPack install from the tag. Pushing the tag by
+   hand still runs the same publish steps.
 
 ## Specification
 
