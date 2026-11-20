@@ -7,6 +7,10 @@ allow those releases to break. See `docs/harness/principles.md`.
 
 ## Unreleased
 
+### Added
+
+- Deno can install `@kt3k/gawa` from JSR (`deno add jsr:@kt3k/gawa`). The git URL import still works.
+
 ## 0.1.0
 
 - Web SDK, iOS bridge, and Android bridge. Protocol version 1.

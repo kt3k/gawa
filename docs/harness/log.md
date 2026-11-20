@@ -3,6 +3,14 @@
 Short notes from maintenance passes. User-visible changes also go in
 `CHANGELOG.md` under `## Unreleased`. Newest first.
 
+## 2026-11-20
+
+JSR package `@kt3k/gawa` is configured in `jsr.json` (web module only).
+`deno publish --dry-run` runs in the web CI job. The `release` workflow
+publishes to JSR after the GitHub Release, and the `jsr` workflow can
+publish an existing tag without cutting another release. Neither was run.
+OIDC is already linked on JSR.
+
 ## 2026-11-19
 
 Releases are cut from `main` with workflow_dispatch on `.github/workflows/release.yml`

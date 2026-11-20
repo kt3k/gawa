@@ -1,0 +1,20 @@
+{
+  "name": "@kt3k/gawa",
+  "version": "0.1.0",
+  "license": "MIT",
+  "exports": "./web/mod.ts",
+  "publish": {
+    "include": ["LICENSE", "README.md", "web/mod.ts"],
+    "exclude": [
+      "**/*_test.ts",
+      "web/dist",
+      "ios",
+      "android",
+      "examples",
+      "site",
+      "docs",
+      "schema",
+      "scripts"
+    ]
+  }
+}

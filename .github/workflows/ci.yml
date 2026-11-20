@@ -30,6 +30,8 @@ jobs:
         run: web/build.sh && git diff --exit-code -- web/dist
       - name: package.json and Android version match
         run: deno run -A scripts/check-versions.ts
+      - name: JSR package dry run
+        run: deno publish --dry-run
       - name: workflow tokens are read-only at the top level
         run: deno run -A scripts/check-workflow-permissions.ts
       - name: schema generator

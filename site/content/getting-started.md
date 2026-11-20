@@ -28,7 +28,7 @@ Conformance is [`protocol/cases.json`](https://github.com/kt3k/gawa/blob/main/pr
 
 ### Option 2. Use the reference implementation
 
-These packages are the implementation in this repository. They install from a git tag.
+These packages are the implementation in this repository. iOS, Android, and npm install from a git tag. Deno uses JSR.
 
 ### Web (npm / pnpm / yarn)
 
@@ -46,7 +46,17 @@ The package name is `gawa`.
 
 ### Web (Deno)
 
-Import the source by URL.
+Add the JSR package `jsr:@kt3k/gawa`.
+
+```sh
+deno add jsr:@kt3k/gawa
+```
+
+```ts
+import { createBridge } from "jsr:@kt3k/gawa";
+```
+
+The source is also available by URL.
 
 ```ts
 import { createBridge } from "https://raw.githubusercontent.com/kt3k/gawa/{{tag}}/web/mod.ts";

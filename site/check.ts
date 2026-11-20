@@ -207,7 +207,8 @@ try {
     if (body.includes("{{version}}") || body.includes("{{tag}}")) {
       fail(`unfilled version token in ${page}`);
     }
-    if (body.includes("@kt3k/gawa")) {
+    // npm is the unscoped package `gawa`. `jsr:@kt3k/gawa` is the Deno package.
+    if (body.replaceAll("jsr:@kt3k/gawa", "").includes("@kt3k/gawa")) {
       fail(`package import @kt3k/gawa in ${page}`);
     }
     if (base !== "/") {
@@ -233,6 +234,8 @@ try {
     `npm install github:kt3k/gawa#v${version}`,
     'from "gawa"',
     `https://raw.githubusercontent.com/kt3k/gawa/v${version}/web/mod.ts`,
+    "jsr:@kt3k/gawa",
+    "deno add jsr:@kt3k/gawa",
     `.package(url: "https://github.com/kt3k/gawa", from: "${version}")`,
     `com.github.kt3k:gawa:v${version}`,
     'maven("https://jitpack.io")',
@@ -340,6 +343,7 @@ try {
       "connectedDebugAndroidTest",
       "Option 1. Make your own",
       "https://github.com/kt3k/gawa/blob/main/SPEC.md",
+      "jsr:@kt3k/gawa",
     ],
     "docs/why/": [
       "Make your own",

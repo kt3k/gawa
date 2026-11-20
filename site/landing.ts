@@ -59,11 +59,18 @@ export function landing(version: string, base: string): string {
     {
       id: "deno",
       label: "Deno",
-      html: blocks([{
-        lang: "ts",
-        code:
-          `import { createBridge } from "https://raw.githubusercontent.com/kt3k/gawa/${tag}/web/mod.ts";\n`,
-      }]),
+      html: blocks([
+        { lang: "sh", code: "deno add jsr:@kt3k/gawa\n" },
+        {
+          lang: "ts",
+          code: `import { createBridge } from "jsr:@kt3k/gawa";\n`,
+        },
+        {
+          lang: "ts",
+          code:
+            `import { createBridge } from "https://raw.githubusercontent.com/kt3k/gawa/${tag}/web/mod.ts";\n`,
+        },
+      ]),
     },
     {
       id: "ios",
@@ -304,7 +311,7 @@ bridge.emit("back")
     ${promptBlock()}
     <p class="option-kicker">Option 2</p>
     <h3 class="option-title">Use the reference implementation</h3>
-    <p class="section-intro">These packages are the implementation in this repository. They install straight from a git tag — no registry needed.</p>
+    <p class="section-intro">These packages are the implementation in this repository. iOS, Android, and npm install from a git tag. Deno uses JSR.</p>
     ${install}
     <p class="caption">The npm package name is <code>gawa</code> (the committed <code>web/dist</code>). Swift Package Manager uses the <code>Gawa</code> product, iOS 15+ / macOS 12+. Android is minSdk 24, built by <a href="https://jitpack.io/#kt3k/gawa">JitPack</a> on first request.</p>
   </section>
