@@ -22,7 +22,8 @@ whole manual into the task.
   ruleset and push directly.
 - Stop for a release, a breaking change, a vulnerability, or an external post.
   A release is cut by the maintainer from `main` (Actions, workflow
-  `release`, Run workflow), not by pushing a tag yourself.
+  `release`, Run workflow), not by pushing a tag yourself. Do not run the
+  `jsr` workflow either. It publishes an existing tag to JSR.
   [docs/harness/boundaries.md](docs/harness/boundaries.md)
 
 ## Where things are

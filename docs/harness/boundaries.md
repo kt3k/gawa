@@ -12,9 +12,10 @@ This repository does not. Propose it. Do not ship it.
 
 ## Releases and publishing
 
-Do not push a tag, run the `release` workflow, create a GitHub Release, or
-publish to npm unless the maintainer asked for that version. The maintainer
-cuts a release from `main` with Actions, workflow `release`, Run workflow.
+Do not push a tag, run the `release` or `jsr` workflow, create a GitHub
+Release, or publish to npm or JSR unless the maintainer asked for that
+version. The maintainer cuts a release from `main` with Actions, workflow
+`release`, Run workflow. The `jsr` workflow publishes an existing tag only.
 The workflow uses `GITHUB_TOKEN` for the tag and the GitHub Release, and
 `NPM_TOKEN` for npm. Do not read, print, or invent either value.
 

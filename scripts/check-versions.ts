@@ -1,6 +1,6 @@
 /**
- * package.json, the Android default version, and (when a tag is given)
- * CHANGELOG.md all name the same version.
+ * package.json, jsr.json, the Android default version, and (when a tag is
+ * given) CHANGELOG.md all name the same version.
  *
  *   deno run -A scripts/check-versions.ts
  *   deno run -A scripts/check-versions.ts v0.1.0
@@ -11,6 +11,18 @@ const pkg = JSON.parse(
 ) as {
   version: string;
 };
+const jsr = JSON.parse(
+  await Deno.readTextFile(new URL("jsr.json", root)),
+) as {
+  name?: string;
+  version?: string;
+};
+if (jsr.name !== "@kt3k/gawa") {
+  throw new Error(`jsr.json name ${jsr.name} != @kt3k/gawa`);
+}
+if (jsr.version !== pkg.version) {
+  throw new Error(`jsr.json ${jsr.version} != package.json ${pkg.version}`);
+}
 const gradle = await Deno.readTextFile(
   new URL("android/gawa/build.gradle.kts", root),
 );

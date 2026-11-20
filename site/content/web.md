@@ -1,9 +1,9 @@
 # Web
 
-The page side is one module, [`web/mod.ts`](https://github.com/kt3k/gawa/blob/main/web/mod.ts). npm installs the compiled `web/dist` (`mod.js` and `mod.d.ts`). Deno imports the TypeScript source. The package name is `gawa`.
+The page side is one module, [`web/mod.ts`](https://github.com/kt3k/gawa/blob/main/web/mod.ts). npm installs the compiled `web/dist` (`mod.js` and `mod.d.ts`). Deno installs `jsr:@kt3k/gawa`, or imports the TypeScript source by URL. The npm package name is `gawa`.
 
 ```ts
-import { createBridge, GawaError, PROTOCOL } from "gawa";
+import { createBridge, GawaError, PROTOCOL } from "jsr:@kt3k/gawa";
 ```
 
 `PROTOCOL` is `1`. Every envelope carries `gawa: 1`. Messages with another version are ignored.

@@ -40,8 +40,8 @@ https://github.com/kt3k/gawa/blob/main/protocol/cases.json
 ## Option 2. Use the reference implementation
 
 The packages in this repository are one implementation of the spec. Use them
-when you want that code instead of writing your own. Everything is installed
-straight from a git tag — no registry needed.
+when you want that code instead of writing your own. iOS, Android, and the
+npm package install from a git tag. Deno can use JSR.
 
 **Web** (npm / pnpm / yarn): the compiled `web/dist` is committed.
 
@@ -53,7 +53,17 @@ npm install github:kt3k/gawa#v0.1.0
 import { createBridge } from "gawa";
 ```
 
-**Web** (Deno): import the source by URL.
+**Web** (Deno): add the JSR package `@kt3k/gawa`.
+
+```sh
+deno add jsr:@kt3k/gawa
+```
+
+```ts
+import { createBridge } from "jsr:@kt3k/gawa";
+```
+
+The source is also available by URL:
 
 ```ts
 import { createBridge } from "https://raw.githubusercontent.com/kt3k/gawa/v0.1.0/web/mod.ts";
@@ -228,9 +238,10 @@ own client.
 5. Cut the release from `main`: Actions, workflow `release`, Run workflow.
    Leave the version input empty to use `package.json`, or type `X.Y.Z`.
    The workflow tags `vX.Y.Z`, opens the GitHub Release from that changelog
-   section, and publishes to npm when `NPM_TOKEN` is set. Deno, Swift
-   Package Manager, and JitPack install from the tag. Pushing the tag by
-   hand still runs the same publish steps.
+   section, publishes to JSR (`@kt3k/gawa`), and publishes to npm when
+   `NPM_TOKEN` is set. Deno, Swift Package Manager, and JitPack install from
+   the tag. Pushing the tag by hand still runs the same publish steps. To
+   publish an existing tag to JSR only, run the `jsr` workflow on `main`.
 
 ## Specification
 

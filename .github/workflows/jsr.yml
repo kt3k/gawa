@@ -1,0 +1,69 @@
+# Publish the version already released on main to JSR.
+# Use this when the git tag exists and JSR does not have that version yet.
+# It does not create a tag or a GitHub Release.
+
+name: jsr
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version without a leading v. Leave empty to use package.json.
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Only main can be published
+        shell: bash
+        run: |
+          if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
+            echo "::error::JSR publishes from refs/heads/main (this ref is ${GITHUB_REF})."
+            exit 1
+          fi
+
+      - name: Resolve the version
+        id: version
+        shell: bash
+        run: |
+          version="${{ inputs.version }}"
+          version="${version#v}"
+          if [ -z "${version}" ]; then
+            version="$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')"
+          fi
+          if ! printf '%s' "${version}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::version must be X.Y.Z (got '${version}')."
+            exit 1
+          fi
+          echo "tag=v${version}" >> "${GITHUB_OUTPUT}"
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Versions match the changelog
+        shell: bash
+        run: deno run -A scripts/check-versions.ts "${{ steps.version.outputs.tag }}"
+
+      - name: Tag must already exist
+        shell: bash
+        run: |
+          tag="${{ steps.version.outputs.tag }}"
+          if ! git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "::error::tag ${tag} does not exist. Cut the release first."
+            exit 1
+          fi
+
+      - name: Publish to JSR
+        run: deno publish

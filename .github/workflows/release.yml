@@ -2,6 +2,7 @@
 # A tag pushed with GITHUB_TOKEN does not start this workflow again, so the
 # dispatch path creates the tag and the GitHub Release in the same run.
 # npm publish runs only when the NPM_TOKEN secret is set.
+# JSR publish uses GitHub OIDC and does not use a token.
 # Deno, Swift Package Manager, and JitPack install from the tag itself.
 
 name: release
@@ -116,3 +117,26 @@ jobs:
         with:
           tag: ${{ steps.version.outputs.tag }}
           npm-token: ${{ secrets.NPM_TOKEN }}
+
+  # A tag pushed with GITHUB_TOKEN does not start another workflow, so JSR
+  # publishes in this run. The job only reads the repo and asks for an OIDC token.
+  jsr:
+    needs: [release, dispatch]
+    if: >-
+      always() &&
+      (needs.release.result == 'success' || needs.dispatch.result == 'success') &&
+      needs.release.result != 'failure' &&
+      needs.dispatch.result != 'failure' &&
+      needs.release.result != 'cancelled' &&
+      needs.dispatch.result != 'cancelled'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Publish to JSR
+        run: deno publish
