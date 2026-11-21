@@ -7,9 +7,12 @@ allow those releases to break. See `docs/harness/principles.md`.
 
 ## Unreleased
 
+## 0.1.1
+
 ### Added
 
 - Deno can install `@kt3k/gawa` from JSR (`deno add jsr:@kt3k/gawa`). The git URL import still works.
+- A release can be cut from `main` with the `release` workflow (`workflow_dispatch`). That run tags `vX.Y.Z`, creates the GitHub Release, and publishes to JSR. Pushing the tag by hand still runs the same publish steps.
 
 ## 0.1.0
 
