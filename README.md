@@ -46,7 +46,7 @@ npm package install from a git tag. Deno can use JSR.
 **Web** (npm / pnpm / yarn): the compiled `web/dist` is committed.
 
 ```sh
-npm install github:kt3k/gawa#v0.1.0
+npm install github:kt3k/gawa#v0.1.1
 ```
 
 ```ts
@@ -66,14 +66,14 @@ import { createBridge } from "jsr:@kt3k/gawa";
 The source is also available by URL:
 
 ```ts
-import { createBridge } from "https://raw.githubusercontent.com/kt3k/gawa/v0.1.0/web/mod.ts";
+import { createBridge } from "https://raw.githubusercontent.com/kt3k/gawa/v0.1.1/web/mod.ts";
 ```
 
 **iOS** (Swift Package Manager, iOS 15+ / macOS 12+): add
 `https://github.com/kt3k/gawa` and use the `Gawa` product.
 
 ```swift
-.package(url: "https://github.com/kt3k/gawa", from: "0.1.0")
+.package(url: "https://github.com/kt3k/gawa", from: "0.1.1")
 ```
 
 **Android** (minSdk 24) via [JitPack](https://jitpack.io/#kt3k/gawa), which
@@ -90,7 +90,7 @@ dependencyResolutionManagement {
 }
 // build.gradle.kts
 dependencies {
-    implementation("com.github.kt3k:gawa:v0.1.0")
+    implementation("com.github.kt3k:gawa:v0.1.1")
 }
 ```
 
@@ -228,7 +228,7 @@ own client.
 
 ## Releasing
 
-1. Bump the version in `package.json` and the default in
+1. Bump the version in `package.json`, `jsr.json`, and the default in
    `android/gawa/build.gradle.kts`.
 2. Run `web/build.sh` and commit `web/dist` (CI fails if it is stale).
 3. Add a `## X.Y.Z` section to `CHANGELOG.md`. The heading has no date:

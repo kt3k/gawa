@@ -7,7 +7,7 @@ plugins {
 
 // JitPack (jitpack.yml) passes -PpublishGroup / -PpublishVersion.
 group = findProperty("publishGroup")?.toString() ?: "com.github.kt3k"
-version = findProperty("publishVersion")?.toString() ?: "0.1.0"
+version = findProperty("publishVersion")?.toString() ?: "0.1.1"
 
 android {
     namespace = "io.github.kt3k.gawa"

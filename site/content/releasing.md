@@ -2,7 +2,7 @@
 
 Deno, Swift Package Manager, and JitPack install from a git tag. npm can install from that tag too. The release publishes `jsr:@kt3k/gawa`, and publishes to the npm registry when the `NPM_TOKEN` secret is set.
 
-1. Bump the version in `package.json` and the default in `android/gawa/build.gradle.kts` (`findProperty("publishVersion") ?: "…"`). CI checks that those two strings match.
+1. Bump the version in `package.json`, `jsr.json`, and the default in `android/gawa/build.gradle.kts` (`findProperty("publishVersion") ?: "…"`). CI checks that those strings match.
 2. Add a `## X.Y.Z` section to `CHANGELOG.md`. Do not put a date on that heading. `scripts/check-versions.ts` matches `## X.Y.Z` exactly.
 3. Run `web/build.sh` and commit `web/dist`. CI fails if that directory is stale: the web job runs `web/build.sh && git diff --exit-code -- web/dist`.
 4. Merge to `main` and wait until the checks `web`, `ios`, `android`, and `android-e2e` succeed on that commit.

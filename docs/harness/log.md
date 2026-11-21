@@ -3,6 +3,12 @@
 Short notes from maintenance passes. User-visible changes also go in
 `CHANGELOG.md` under `## Unreleased`. Newest first.
 
+## 2026-11-21
+
+Version 0.1.1 folds the JSR install and the `workflow_dispatch` release
+into `CHANGELOG.md`. The tag is pushed by hand after the version PR merges,
+so the existing tag-push path creates the GitHub Release and publishes to JSR.
+
 ## 2026-11-20
 
 JSR package `@kt3k/gawa` is configured in `jsr.json` (web module only).
