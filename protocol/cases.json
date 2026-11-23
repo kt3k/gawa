@@ -76,6 +76,21 @@
       "reply": null
     },
     {
+      "name": "boolean id is ignored",
+      "request": { "gawa": 1, "id": true, "method": "app.version" },
+      "reply": null
+    },
+    {
+      "name": "fractional id is ignored",
+      "request": { "gawa": 1, "id": 1.5, "method": "app.version" },
+      "reply": null
+    },
+    {
+      "name": "boolean gawa is ignored",
+      "request": { "gawa": true, "id": 1, "method": "app.version" },
+      "reply": null
+    },
+    {
       "name": "message without gawa is ignored",
       "request": { "id": 1, "method": "app.version" },
       "reply": null

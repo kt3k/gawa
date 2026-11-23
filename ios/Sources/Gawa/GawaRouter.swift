@@ -87,8 +87,8 @@ public final class GawaRouter {
         guard
             let data = body.data(using: .utf8),
             let env = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-            env["gawa"] as? Int == Self.protocolVersion,
-            let id = env["id"] as? Int,
+            Self.jsonInt(env["gawa"]) == Self.protocolVersion,
+            let id = Self.jsonInt(env["id"]),
             let method = env["method"] as? String
             else {
             log?("ignore \(body)")
@@ -134,6 +134,16 @@ public final class GawaRouter {
     }
 
     // MARK: - JSON helpers
+
+    /// A JSON integer. `JSONSerialization` boxes booleans as `NSNumber`, and
+    /// `as? Int` would read `true` as `1`.
+    private static func jsonInt(_ value: Any?) -> Int? {
+        guard let number = value as? NSNumber else { return nil }
+        if CFGetTypeID(number as CFTypeRef) == CFBooleanGetTypeID() { return nil }
+        let double = number.doubleValue
+        if !double.isFinite || double != double.rounded(.towardZero) { return nil }
+        return value as? Int
+    }
 
     static func decode<P: Decodable>(_ type: P.Type, _ data: Data?) throws -> P {
         do {
