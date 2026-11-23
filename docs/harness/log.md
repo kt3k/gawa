@@ -3,6 +3,21 @@
 Short notes from maintenance passes. User-visible changes also go in
 `CHANGELOG.md` under `## Unreleased`. Newest first.
 
+## 2026-11-23
+
+The iOS router treated a JSON boolean as an integer, because
+`JSONSerialization` boxes `true` as `NSNumber` and `as? Int` reads it as `1`.
+A request with `gawa: true` or `id: true` got a reply on iOS and none on
+Android. `GawaRouter.jsonInt` rejects booleans and fractional numbers.
+`protocol/cases.json` now has those three ignored requests, and SPEC.md
+section 4 names them next to the numeric-string rule. `deno run -A
+scripts/health.ts` passed. iOS and Android were not run locally.
+
+Left open: Dependabot PR #11 (`gradle/actions` 4 to 6) is green, but v6
+moves caching into a proprietary component and says the upgrade accepts
+that component's terms. Caching is on unless disabled. That acceptance is
+a maintainer decision. The backlog items that need a contact are unchanged.
+
 ## 2026-11-21
 
 Version 0.1.1 folds the JSR install and the `workflow_dispatch` release

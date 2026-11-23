@@ -82,7 +82,7 @@ reference page MUST accept the envelopes that section 5 produces.
 
 Messages are JSON texts. Every envelope carries `"gawa": 1`. A receiver MUST
 ignore a message that is not JSON, not an object, or whose `gawa` value is not
-the number `1`.
+the number `1`. A boolean `true` is not that number.
 
 ### 4.1 Request (page to native)
 
@@ -91,11 +91,12 @@ the number `1`.
 ```
 
 - `id` MUST be a JSON number with no fractional part, unique among the page's
-  in-flight requests. A numeric string, such as `"7"`, MUST NOT be treated as
-  an id. A message whose `id` is not such a number MUST be ignored by the
-  router (it produces no reply). The iOS and Android profiles accept integers
-  that fit in a signed 32-bit integer. The reference page allocates `1`, `2`,
-  `3`, and so on.
+  in-flight requests. A numeric string, such as `"7"`, a boolean, such as
+  `true`, and a fractional number, such as `1.5`, MUST NOT be treated as an
+  id. A message whose `id` is not such a number MUST be ignored by the router
+  (it produces no reply). The iOS and Android profiles accept integers that
+  fit in a signed 32-bit integer. The reference page allocates `1`, `2`, `3`,
+  and so on.
 - `method` MUST be a string. Dotted names (`kv.get`) are a convention, not a
   protocol rule.
 - `params` MAY be any JSON value. When the method takes no parameters the page

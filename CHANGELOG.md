@@ -7,6 +7,10 @@ allow those releases to break. See `docs/harness/principles.md`.
 
 ## Unreleased
 
+### Fixed
+
+- The iOS router ignores a request whose `gawa` or `id` is a JSON boolean. `JSONSerialization` boxes `true` as a number, so `as? Int` read it as `1` and the router answered. Android already ignored those messages. A fractional `id`, such as `1.5`, is ignored by the same check. `protocol/cases.json` covers a boolean `gawa`, a boolean `id`, and a fractional `id`.
+
 ## 0.1.1
 
 ### Added
